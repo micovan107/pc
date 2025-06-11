@@ -1,0 +1,1093 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    overflow: hidden;
+    background-color: #000;
+    height: 100vh;
+    width: 100vw;
+}
+
+.os-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Lock Screen */
+.lock-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    color: white;
+    z-index: 1000;
+}
+
+.lock-screen-time {
+    font-size: 6rem;
+    font-weight: 300;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.lock-screen-date {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.lock-screen-instruction {
+    font-size: 1rem;
+    opacity: 0.8;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* Login Screen */
+.login-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    color: white;
+    z-index: 900;
+    display: none;
+}
+
+.user-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-name {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.password-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+}
+
+.password-input input {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.password-input input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.password-input button {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 25px;
+    background-color: #0078d7;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.password-input button:hover {
+    background-color: #0086f0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Desktop */
+.desktop {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+/* Taskbar */
+.taskbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background-color: rgba(25, 25, 25, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.start-menu-button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+}
+
+.start-menu-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.taskbar-apps {
+    display: flex;
+    height: 100%;
+    margin-left: 10px;
+}
+
+.taskbar-app {
+    height: 100%;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    color: white;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.taskbar-app.active {
+    border-bottom-color: #0078d7;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.taskbar-app:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.taskbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.taskbar-time {
+    color: white;
+    padding: 0 15px;
+    font-size: 0.85rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.taskbar-time:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.taskbar-icons {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 10px;
+    color: white;
+}
+
+.taskbar-icons i {
+    margin: 0 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* Start Menu */
+.start-menu {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    width: 350px;
+    background-color: rgba(25, 25, 25, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.3);
+    color: white;
+    z-index: 200;
+    display: none;
+    animation: slideUp 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.start-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.power-options {
+    display: flex;
+}
+
+.power-options i {
+    margin-left: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.power-options i:hover {
+    color: #0078d7;
+}
+
+.start-menu-apps {
+    padding: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.app-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.app-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-item i {
+    margin-right: 15px;
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+/* Desktop Icons */
+.desktop-icons {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 80px);
+    grid-gap: 20px;
+    justify-content: start;
+}
+
+.desktop-icon {
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.desktop-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.desktop-icon i {
+    margin-bottom: 5px;
+    font-size: 2rem;
+}
+
+.desktop-icon span {
+    font-size: 0.8rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    word-break: break-word;
+}
+
+/* App Windows */
+.app-window {
+    position: absolute;
+    background-color: rgba(40, 40, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    color: white;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    resize: both;
+    min-width: 400px;
+    min-height: 300px;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.window-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    height: 30px;
+    background-color: rgba(60, 60, 60, 0.8);
+    cursor: move;
+}
+
+.window-title {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.window-title i {
+    margin-right: 8px;
+    font-size: 0.8rem;
+}
+
+.window-controls {
+    display: flex;
+}
+
+.window-controls span {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.window-minimize:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.window-maximize:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.window-close:hover {
+    background-color: #e81123;
+}
+
+.window-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    background-color: rgba(50, 50, 50, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.window-toolbar button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.window-toolbar button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.address-bar {
+    flex: 1;
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: rgba(30, 30, 30, 0.8);
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+
+.window-sidebar {
+    width: 200px;
+    background-color: rgba(45, 45, 45, 0.8);
+    padding: 10px 0;
+    overflow-y: auto;
+}
+
+.sidebar-item {
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item.active {
+    background-color: rgba(0, 120, 215, 0.4);
+}
+
+.sidebar-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+}
+
+.window-content {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    background-color: rgba(35, 35, 35, 0.8);
+}
+
+.window-statusbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background-color: rgba(50, 50, 50, 0.8);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* File Explorer */
+.file-item {
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.file-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.file-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+}
+
+/* Browser */
+.browser-toolbar {
+    padding: 8px 10px;
+}
+
+.browser-content {
+    background-color: white;
+    color: #333;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.browser-page {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.browser-page h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.browser-search {
+    display: flex;
+    margin: 20px 0;
+}
+
+.browser-search input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px 0 0 25px;
+    font-size: 1rem;
+}
+
+.browser-search button {
+    padding: 10px 20px;
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 0 25px 25px 0;
+    cursor: pointer;
+}
+
+.browser-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 15px;
+    margin-top: 30px;
+}
+
+.browser-link-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.browser-link-item:hover {
+    background-color: #e5e5e5;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.browser-link-item i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #0078d7;
+}
+
+/* Notepad */
+.notepad-toolbar {
+    padding: 0;
+    display: flex;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown span {
+    display: block;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.dropdown span:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: rgba(40, 40, 40, 0.95);
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dropdown-content div {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropdown-content div:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.notepad-content {
+    padding: 0;
+}
+
+.notepad-content textarea {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 30, 30, 0.8);
+    color: white;
+    border: none;
+    padding: 10px;
+    font-family: 'Consolas', monospace;
+    font-size: 1rem;
+    resize: none;
+}
+
+.notepad-content textarea:focus {
+    outline: none;
+}
+
+/* Calculator */
+.calculator-display {
+    padding: 20px;
+    text-align: right;
+    background-color: rgba(30, 30, 30, 0.8);
+}
+
+.calc-history {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    min-height: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.calc-result {
+    font-size: 2.5rem;
+    font-weight: 300;
+}
+
+.calculator-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 1px;
+    background-color: rgba(30, 30, 30, 0.8);
+    padding: 1px;
+}
+
+.calc-btn {
+    padding: 15px;
+    font-size: 1.2rem;
+    border: none;
+    background-color: rgba(50, 50, 50, 0.8);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calc-btn:hover {
+    background-color: rgba(70, 70, 70, 0.8);
+}
+
+.calc-btn-operator {
+    background-color: rgba(60, 60, 60, 0.8);
+}
+
+.calc-btn-special {
+    background-color: rgba(40, 40, 40, 0.8);
+}
+
+.calc-btn-equals {
+    background-color: #0078d7;
+}
+
+.calc-btn-equals:hover {
+    background-color: #0086f0;
+}
+
+/* Settings */
+.settings-sidebar {
+    width: 250px;
+}
+
+.settings-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.settings-content h2 {
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section h3 {
+    margin-bottom: 15px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.settings-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.settings-option span {
+    min-width: 120px;
+}
+
+.settings-option select {
+    padding: 8px 12px;
+    background-color: rgba(60, 60, 60, 0.8);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.color-options {
+    display: flex;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.active {
+    border-color: white;
+}
+
+.toggle-option {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-option span {
+    min-width: auto;
+    margin: 0 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #0078d7;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Context Menu */
+.context-menu {
+    position: absolute;
+    width: 200px;
+    background-color: rgba(40, 40, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 1000;
+    overflow: hidden;
+    animation: fadeIn 0.2s;
+}
+
+.context-menu-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.context-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.context-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+}
+
+.context-menu-separator {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+}
+
+/* Notification Center */
+.notification-center {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 100%;
+    background-color: rgba(25, 25, 25, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
+    color: white;
+    z-index: 900;
+    display: none;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notification-header h3 {
+    font-weight: 400;
+}
+
+.notification-header button {
+    background: none;
+    border: none;
+    color: #0078d7;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.notification-header button:hover {
+    text-decoration: underline;
+}
+
+.notification-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.notification-item {
+    display: flex;
+    padding: 15px;
+    background-color: rgba(45, 45, 45, 0.8);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: all 0.2s;
+}
+
+.notification-item:hover {
+    background-color: rgba(55, 55, 55, 0.8);
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #0078d7;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 5px;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Power Dialog */
+.power-dialog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+}
+
+.power-dialog-content {
+    background-color: rgba(40, 40, 40, 0.95);
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    animation: scaleIn 0.3s;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.power-option {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.power-option:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.power-option i {
+    margin-right: 15px;
+    width: 20px;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .start-menu {
+        width: 100%;
+    }
+    
+    .notification-center {
+        width: 100%;
+    }
+    
+    .app-window {
+        width: 100% !important;
+        height: calc(100% - 40px) !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+}
+
+/* Dark Mode */
+.dark-mode {
+    /* Dark mode styles would go here */
+}
+
+/* Animations */
+.window-drag {
+    opacity: 0.8;
+    transform: scale(0.98);
+    transition: none;
+}
+
+.window-resize {
+    transition: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
