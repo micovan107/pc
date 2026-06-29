@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C&C Shell // Target Acquired</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Roboto:wght@400;700&display=swap');
 
         body {
-            background-color: #0a0a0a;
-            color: #d4d4d4;
-            font-family: 'VT323', monospace;
-            font-size: 1.2rem;
+            background-color: #f4f6f8;
+            color: #333;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
             margin: 0;
             padding: 20px;
         }
@@ -20,69 +20,83 @@
             margin: auto;
         }
         #bot-title {
-            color: #00ff41;
-            text-shadow: 0 0 5px #00ff41;
+            color: #111827;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
         }
         #terminal {
-            background-color: rgba(0, 0, 0, 0.8);
-            border: 1px solid #00ff41;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5) inset;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
             padding: 15px;
             height: 500px;
             overflow-y: scroll;
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-size: 1.1rem;
+            font-family: 'Roboto Mono', monospace; /* Font cho code */
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05) inset;
         }
-        /* Custom scrollbar for terminal */
+        /* Custom scrollbar */
         #terminal::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
         #terminal::-webkit-scrollbar-track {
-            background: #111;
+            background: #f1f1f1;
         }
         #terminal::-webkit-scrollbar-thumb {
-            background: #00ff41;
-            box-shadow: 0 0 5px #00ff41;
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        #terminal::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
         .input-area {
             display: flex;
-            margin-top: 10px;
-            border: 1px solid #00ff41;
+            margin-top: 15px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: #fff;
         }
         #command-input {
             flex-grow: 1;
             background-color: transparent;
-            color: #d4d4d4;
+            color: #333;
             border: none;
-            padding: 10px;
-            font-family: 'VT323', monospace;
-            font-size: 1.2rem;
+            padding: 12px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
         }
         #command-input:focus {
             outline: none;
         }
         #send-button {
-            background-color: #00ff41;
-            color: #0a0a0a;
+            background-color: #0056b3;
+            color: #ffffff;
             border: none;
-            padding: 10px 15px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-family: 'VT323', monospace;
-            font-size: 1.2rem;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
             text-transform: uppercase;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            transition: background-color 0.2s;
         }
         #send-button:hover {
-            background-color: #55ff88;
+            background-color: #004494;
         }
         .command-echo {
-            color: #00aaff; /* Light blue for user commands */
+            color: #0056b3; /* Xanh dương cho lệnh người dùng */
+            font-weight: bold;
         }
         .command-output {
-            color: #aaffaa; /* Light green for command output */
+            color: #374151; /* Xám đậm cho kết quả */
+            margin-top: 5px;
+            margin-bottom: 15px;
         }
         a {
-            color: #00ff41;
+            color: #0056b3;
             text-decoration: none;
         }
         a:hover {
@@ -95,33 +109,34 @@
             align-items: center;
         }
         #clear-button {
-            background-color: #c0392b;
-            color: #ecf0f1;
-            border: 1px solid #e74c3c;
-            padding: 5px 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: 1px solid #dc3545;
+            padding: 8px 15px;
             cursor: pointer;
-            font-family: 'VT323', monospace;
-            font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
             text-transform: uppercase;
-            box-shadow: 0 0 5px #c0392b;
+            border-radius: 5px;
+            transition: background-color 0.2s;
         }
         #clear-button:hover {
-            background-color: #e74c3c;
+            background-color: #c82333;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 id="bot-title">ESTABLISHING SHELL...</h2>
+        <h2 id="bot-title">Đang kết nối đến mục tiêu...</h2>
         <div id="terminal"></div>
         <div class="input-area">
-            <span style="padding: 10px; color: #00ff41;">$&gt;</span>
-            <input type="text" id="command-input" placeholder="Enter command..." autocomplete="off">
-            <button id="send-button">Execute</button>
+            <span style="padding: 10px 0 10px 10px; color: #9ca3af;">&gt;</span>
+            <input type="text" id="command-input" placeholder="Nhập lệnh..." autocomplete="off">
+            <button id="send-button">Gửi</button>
         </div>
         <div class="actions">
-            <a href="index.html">&lt;&lt; Back to Target List</a>
-            <button id="clear-button">Clear History</button>
+            <a href="index.html">&lt;&lt; Quay lại danh sách</a>
+            <button id="clear-button">Xóa lịch sử</button>
         </div>
     </div>
 
@@ -151,9 +166,9 @@
         const displayedResults = new Set();
 
         if (!botId) {
-            terminal.textContent = "ERROR: TARGET ID NOT SPECIFIED. ABORTING.";
+            terminal.textContent = "LỖI: KHÔNG XÁC ĐỊNH ĐƯỢC MỤC TIÊU.";
         } else {
-            document.getElementById('bot-title').textContent = `SHELL ACQUIRED // TARGET: ${botId}`;
+            document.getElementById('bot-title').textContent = `Mục tiêu: ${botId}`;
             
             const commandsRef = ref(database, `bots/${botId}/commands`);
             const resultsRef = ref(database, `bots/${botId}/results`);
@@ -204,7 +219,7 @@
                     const outputDiv = document.createElement('div');
                     outputDiv.className = 'command-output';
                     // Xử lý trường hợp output rỗng hoặc không tồn tại
-                    outputDiv.textContent = resultData.output || '[No output]';
+                    outputDiv.textContent = resultData.output || '[Không có kết quả]';
                     terminal.appendChild(outputDiv);
                     terminal.scrollTop = terminal.scrollHeight;
                     // Đánh dấu ID kết quả này đã được hiển thị
