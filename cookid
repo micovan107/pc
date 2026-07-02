@@ -309,4 +309,264 @@
 
 
 
+{
+  "url": "https://lazi.vn",
+  "cookies": [
+    {
+      "domain": "lazi.vn",
+      "name": "PHPSESSID",
+      "path": "/",
+      "value": "4tj1q77mdspfce67o9f7bm3uc4"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity",
+      "path": "/",
+      "value": "4072149"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_remember_code",
+      "path": "/",
+      "value": "8648aa43264f69888cb4158431835b7eaa98c1e1"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_vldu",
+      "path": "/",
+      "value": "4o7keiucJPCx4pkZtx08oYq%2F3I6jXlFOr2nyGiteIFrlHyiE9N6qevPIrfvD%2FQfEkQ4yIBWYDuhS5WG7DxB1BkEWsqF5QA%3D%3Dsp3ikvupy3"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity_code",
+      "path": "/",
+      "value": "4072149"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_user_code",
+      "path": "/",
+      "value": "G%2FWj156%2B1ccF44c9MDKoQ%2Becl24Ius7MnTFqe%2FuopZIpLpgeJAs3S1VVZHpZzCNDH%2FbQlZDSXffy9BxhbhVoNQ%3D%3D"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_cms",
+      "path": "/",
+      "value": "s1y6Srni2%2FxKkvB3JD5kkABATj8JnDR8Ez6atmNxuZ%2FWrO8RrHZKB%2FSVDEYiL8GwOE0d1A2Lj4E5ELw%2BbpgMHVIBg5z142HcJbg2ixfpCAeQyZyw9knX57zQuaQGzhaG9kJ0eWPckcmU5Hg6qNT%2B0AFR7EdCIA%2BB90V8zo11rDudGEC73x2P%2B%2FESkifvnD%2B46AIy1Xtxpv7fjglsMmEVjMI43IDMD7itIGQQ1hLod404CaZwy%2FexSaRLgzHXkHuXOJu%2FGov7kuV2v3R1hEfN1JdprDV4eTRly%2BugRtbpEu4k2rHl%2BRaDPTaBCh1J8UZ%2FGhPE%2BP2kDKBoyhTO1CoXGzBmJ0YvChRV8QaNuak8pT2CqcqbUCxfXtRRLN8m%2Bi00T5DSlJkJLBxzImNoFHaeHiUmVEKLQkLw%2BevtytNWZuhh5hsuJvAk389xVW4LX5wm9f8eWVrjVBbQoQSa0gPIMaP6ZAPl8%2Bip7qa8igFSzfga6oQUnaMBcsJ9T9xLaxGQ3oGMxmyviDySL1FmIrEAjKO3tuQAZdpw6UvIEtdh0hmy6a7ewdQua%2BzGa%2B6MdGc%2Fs7J%2F9O88pKpmpQh%2Fup%2BXYwMlGoWzLJlyXxGmyBSk9LQNjhfpKBqFeQrsLTT%2FJN0g"
+    }
+  ]
+}
+
+
+
+
+
+{
+  "url": "https://lazi.vn",
+  "cookies": [
+    {
+      "domain": "lazi.vn",
+      "name": "PHPSESSID",
+      "path": "/",
+      "value": "4tj1q77mdspfce67o9f7bm3uc4"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity",
+      "path": "/",
+      "value": "4046334"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_remember_code",
+      "path": "/",
+      "value": "873be8f025ebc65eafa95cacbffae36e9d40f300"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_vldu",
+      "path": "/",
+      "value": "rrr4ytqjCcGeyLWyQKuDrOX0rttHbUxu77FsPabf%2BYRcXeLw9F1F4Dwc9jYSVVgTa7DUe3s6UPdworLfqHdqbYk%2F45TnLA%3D%3Dmsdklrq3nf"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity_code",
+      "path": "/",
+      "value": "4046334"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_user_code",
+      "path": "/",
+      "value": "OgsprbJE6slkkPcR4v8ESYmf2Pmd2zagm0xl0BeWPVFp1zUhGr6u%2BjnLRDAgSCBAN2pE1xgOu2zMCzoF%2BuhGKg%3D%3D"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_cms",
+      "path": "/",
+      "value": "lc8xA9uoMTkr4BwWWJXL4wwaE7vPvIdN5lFLDe52AseChrMjTWaJALiHPy5OaV8zDG9z5I79JsNcRB4s3VJnqlgcPCbDw6Hp5U8jBvaP5TdsckZ5AK%2FuWbENJ2wIp1sb%2FwKOWIGcAOubwSQ61TaXgZgdHn6reLh3DZc8i2s%2BJF94bvtXQBejhJnw7clHBJqCchbAEWK%2F53DO2YvS8zQx8HspFcH2xp8cJmx6wCZkW3XZzQTaRL9IvdmRwS8QvtDGPrjGXTz4zqPgjyd46rC4aQQTlVa14ryj%2FOswTTFNicJbtg8SzmMR3qIQGz0jeQq1tx%2FqZV2ZKwxY6ICkU1B8OshvFAbNgvMjEk%2F9SGSLCQivdtW0BCvbssFSu9OC2b56TRbpdHh5c5cKvHsSB08PjIlZ1Jpp8tMeBEiY6r3BUdsut%2FXhfOwgIYJy5Ktb9mez9RTSt6xeBbhLQ7slGriZF002xWjxoHcl7hUuEhpUI6E9b3a1vgZ63OcujSa4fN%2FAE4KfGRpo8kmtta3JjjaS3h3iEUyyrllDLeDZDiPo3NQpe2eDrIm%2F2Ou20t1%2BjQWKlHP2mHwjR33YpNMRsT9xBcvh7OCwuviZMyE91TmXgfQhipiHCBAr01vmuBoxIIKl"
+    }
+  ]
+}
+
+
+
+
+
+{
+  "url": "https://lazi.vn",
+  "cookies": [
+    {
+      "domain": "lazi.vn",
+      "name": "PHPSESSID",
+      "path": "/",
+      "value": "4tj1q77mdspfce67o9f7bm3uc4"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity",
+      "path": "/",
+      "value": "4307428"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_remember_code",
+      "path": "/",
+      "value": "f2e04a4cf2aa99424c99513c8595458f5de18ebb"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_vldu",
+      "path": "/",
+      "value": "o69eh3hbI33KnBNHSFrTsMgXJ1IENNegCJu8bb%2B6erRS1ZunxNtRxsUAuWHthr7T084GZVvGgWOavD5e2cxKuLzZeE1uvQ%3D%3Dcspp73j8eb"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity_code",
+      "path": "/",
+      "value": "4307428"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_user_code",
+      "path": "/",
+      "value": "SO9xJroECjs4Rfniehj3DRkcjX%2F8vHUpGIn472apT9rXHYniO8mXcsapjqOqNV%2BLPeA8cBkzLKGu5YRVmUXp2w%3D%3D"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_cms",
+      "path": "/",
+      "value": "nrXodtqagGnIjSZfBuVT0hMcvkFmgpqN79tY%2BLO5N1xYDtczCumj56S8lZdAXfPwracdqoBTx3gJ8YKMGHajbfF6QlHtwtbdipLhnO94w4rGuEC8FZDSJoa5lWCr9VlAoed325K3pB1uxFZaYExsx9VApn6vt8QkhI9F6JiWyT9rKe%2BeIlPezIALRCR%2BtPqFth0vjgRZbD7qKHZUogrcyXVQV9k1MFVtmkwy9OKyn8ABqF1e4BUpoMJD8Vpxbu%2Fawk57nV41gqtY2z4wg4sK1U8wnjHB2Pq%2BeOo%2F%2Fk%2FMWapZrE7ixYgqfOZgU%2FFpVlfKJQ59VFUJ%2FOHaWRNzcqcIH8YFtt1n8zxjs%2FhMhkq%2B1vlY9QAwlxjocT7zb%2BBMrBtTm8yQW0%2Fz7yCmWFWX%2FZWrDHmNvh0umHLy65EmbULoOG4BO6LB4HSSsKKesYuLnSF1R8D8ZP4dZf20xgZIZGKQ8SnALH%2FvFpsGYlTkP3%2FIxkM%2FdnGxBBqppzcvyXdpdZqfc7pBbMkQVVxfVLuJPqkACuqvEAgXMg%2BjxHszC1oDdzxuy58YoEgk0N2xowMoTt6bgInX5HoYIBgFPOHgyWmd0C8645IogWZF9ipVtoh0nrezuXcZln8%2B2Kue41LTEAch"
+    }
+  ]
+}
+
+
+
+
+
+{
+  "url": "https://lazi.vn",
+  "cookies": [
+    {
+      "domain": "lazi.vn",
+      "name": "PHPSESSID",
+      "path": "/",
+      "value": "4tj1q77mdspfce67o9f7bm3uc4"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity",
+      "path": "/",
+      "value": "4093013"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_remember_code",
+      "path": "/",
+      "value": "0a5d6a2606d20c45e14aaec6c0ffb0b08bf5698b"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_vldu",
+      "path": "/",
+      "value": "da1lgm1sENSg7oB2Ly1EcY66RXuuMu2xGkoznVkK9C9esjc4DRPbta4cHcy%2FYuRXFluUZG6VqyvO3KXHgdnNwJle%2FHVBqw%3D%3Dfsohovnwxx"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity_code",
+      "path": "/",
+      "value": "4093013"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_user_code",
+      "path": "/",
+      "value": "OZ6D7C87ipZHYxnURVZnTDe6EqChVZuIeX0RKHh5Ad3V5fUPtJZIp1RevHMd0d0IUINMxKIthFG6pDpW3E6IDQ%3D%3D"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_cms",
+      "path": "/",
+      "value": "j0wYedlE2VCoc0ND7Oy7J5aL4fu4790SscCRxgB41Eprg8UaBx4e9UzxVdQvhl7MvjHfKrTkq3Pe3qhKi6UHlEMgHJOcz3plW8tw73mP0flm8Zl8fQnP8NzCcqHJXad4reOmPdX3wgOTqYlij2T161NZeh70WjBQIPm0dTkKNDCdOv62h6a%2FZciIFjzwYqQ0YSIY3%2F8pihZjw8zkbZTsjfxfE%2BXpboIdfry0IdnzjzfWhCM4AxcsWeg9jhcTL1E54CKNFNUEZSLwz9iq4LookHnLZMDRW7Xf9JJBh239aAUtoX40QhOo1MNQgh5PP3hKl82TiNHwoOkSV6ldXsZFcj7fnMx6ycYoKoyltNe85MAV8xnIB70%2FuJLuddPv3zAyoOdeOTwRM2a3d89dDmirTCNUmbRZOLDLBVsHbQud9KbDlUjyrY2zTmAAAKAMvZRBQzEBQ9DLzxQ%2B8Gn8n%2BPvYqfWgGJhR7zkOkG2G6Y4TjmV6UGBrPXrcYgTmfVQp5m%2B1L1SGpD9EvGB8blhBsWD65u8tiLVfQtzfY8F9Bo60TT0yfXDErkyAem7MEnLA%2FZZsVRSGMBBEn1Hn3hEV4boBOYqcUbNGAc4glPJYzNEJLTsv1U4TZBzVOL4NLTlhYyB"
+    }
+  ]
+}
+
+
+
+
+
+{
+  "url": "https://lazi.vn",
+  "cookies": [
+    {
+      "domain": "lazi.vn",
+      "name": "PHPSESSID",
+      "path": "/",
+      "value": "4tj1q77mdspfce67o9f7bm3uc4"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity",
+      "path": "/",
+      "value": "4657694"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_remember_code",
+      "path": "/",
+      "value": "4838117af5d22fe39610ee3bc5292138b0b6e919"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_vldu",
+      "path": "/",
+      "value": "2j0dsfabDhwP3cyXjfCw5%2BhXssqG81wugBeO05QCEfGEfkd2dj3c%2BMbHUp2eaeLGmjn%2FBYX4WknALJiCyoAihn1nGa5o2Q%3D%3Domzec2mb5s"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_identity_code",
+      "path": "/",
+      "value": "4657694"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_user_code",
+      "path": "/",
+      "value": "SDo0SyeXdgxuvP00XbFw1bJXwJP6lQwjOwAzH048gS7xvhPRMqX5KaoJB3r5K80TPE%2F6flp3Ai9esP2crjjl3A%3D%3D"
+    },
+    {
+      "domain": ".lazi.vn",
+      "name": "lazi_cms",
+      "path": "/",
+      "value": "H1cTHQcMDYQ%2F%2FY%2BIofx5ndj3kETm8TA4zHZpuBeVgzaUH3mEYGZE9Zyf6xMuXYmNw7YVW8qe%2FJ0Bo5FmqDtx3qU3Nymt9lemE6%2Fym995V7KopWx%2FUAKbr%2FPXZre8HYnovrAr%2B9bysP2OIEnq19yDhudUIjm90xMXtjnJQtkuJx6Udt7vgNGscn1sYMr9Kj6mPC4XhxWH3dfBbI8rqQkTUbchDUooXUug1MtWhFzaGXudJ9rj0QB5vIXNd5WPqthFlsQgvjq%2Bf7Mnu0LIDHBZBAIPPwaDyylmvYYeiwDdHQYtZbNeMxVBVCjkdIhQ3bgAfui6dFUWPsEyePiU7VQs%2B86qqgHZaaugGObY0CMRwehbWw4KmzKwakFoiYDE8qa%2BNTuXprH6GROf4bLYWaFtjMENVZVfR7WxRUITbZ8Sg5KHvWI%2BgTpTzI5s8ZIU7pstfsv4BwPndZne7ZGwShKl7RsRDGSqcR6fnRNdczp8Xk7L%2B1QJAmHZoD%2BAgf0B8yX103S%2BwAsLNpLWf8NDZMKWCeM1U2X%2BuvYAzbK3LBfaCEUNITY%2Bb1uD5Azpan6K0hjQR3DgRlpsNMO37pLaIPnxMMKqFEyUz3Xe27uVnz9kxFO0vuPASySMXl5e1vhu0Pso"
+    }
+  ]
+}
+
+
+
+
+
 
