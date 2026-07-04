@@ -9,9 +9,14 @@ jobs:
     timeout-minutes: 360
 
     steps:
-    - name: 1. Tải Ngrok trực tiếp
+    - name: 1. Tải Ngrok Tự Động (Bản Mới Nhất)
       run: |
-        Invoke-WebRequest -Uri "https://bin.equinox.io/c/b34267at1v/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
+        # Tự động lấy link tải trực tiếp bản Windows ổn định mới nhất từ trang chủ
+        $DownloadUrl = (Invoke-WebRequest -Uri "https://ngrok.com/download" -UseBasicParsing).Content | Select-String -Pattern 'https://bin.equinox.io/[^"]+windows-amd64.zip' -AllMatches | % { $_.Matches } | % { $_.Value } | Select-Object -First 1
+        Write-Host "Link tải tìm được: $DownloadUrl"
+        
+        # Tiến hành tải và giải nén vào thư mục riêng
+        Invoke-WebRequest -Uri $DownloadUrl -OutFile "ngrok.zip"
         Expand-Archive -Path "ngrok.zip" -DestinationPath "D:\ngrok_tool" -Force
         
     - name: 2. Kích hoạt RDP Hệ thống
@@ -33,6 +38,5 @@ jobs:
         D:\ngrok_tool\ngrok.exe config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
         
         Write-Host "--- ĐANG KHỞI CHẠY NGROK VÀ LẤY LINK ---"
-        # Chạy trực tiếp hiển thị log ra màn hình GitHub, nếu lỗi sẽ nhìn thấy ngay!
-        # Lệnh này sẽ tự treo máy ảo nếu kết nối thành công
+        # Chạy trực tiếp để xả log lỗi (nếu có) lên thẳng màn hình GitHub Actions
         D:\ngrok_tool\ngrok.exe tcp 3389
