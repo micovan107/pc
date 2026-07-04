@@ -9,32 +9,29 @@ jobs:
     timeout-minutes: 360 
 
     steps:
-    - name: Tải Ngrok bằng liên kết tĩnh bền vững
+    - name: Cài đặt Ngrok chính thức bằng Winget
       run: |
-        $ErrorActionPreference = 'SilentlyContinue'
+        Write-Host "Đang dùng Winget để cài đặt Ngrok bản mới nhất..."
+        # Winget cài cực sạch, tự động nhận cấu hình môi trường
+        winget install ngrok.ngrok --accept-source-agreements --accept-package-agreements
         
-        Write-Host "Thử cách 1: Tải trực tiếp từ CDN ổn định của Chocolatey..."
-        Invoke-WebRequest -Uri "https://chocolatey.org/api/v2/package/ngrok" -OutFile "ngrok.zip"
+        # Làm mới lại biến Path ngay tại step này để nhận lệnh ngrok
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
         
-        if (-not (Test-Path "ngrok.zip") -or (Get-Item "ngrok.zip").Length -lt 50000) {
-            Write-Host "Cách 1 thất bại. Thử cách 2: Tải bản phân phối từ GitHub Release..."
-            Invoke-WebRequest -Uri "https://github.com/ngrok/ngrok-go/releases/download/v3.3.0/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
-        }
-        
-        $ErrorActionPreference = 'Continue'
-        
-        Write-Host "Đang giải nén bộ cài..."
-        Expand-Archive -Path "ngrok.zip" -DestinationPath "." -Force
-        
-        $NgrokFile = Get-ChildItem -Recurse -Filter "ngrok.exe" | Select-Object -First 1
-        if ($NgrokFile) {
-            if ($NgrokFile.DirectoryName -ne (Get-Location).Path) {
-                Move-Item $NgrokFile.FullName "." -Force
-            }
-            Write-Host "Đã cấu hình xong file ngrok.exe!"
+        # Kiểm tra xem hệ thống đã nhận lệnh ngrok chưa
+        if (Get-Command ngrok -ErrorAction SilentlyContinue) {
+            Write-Host "Ngon lành! Hệ thống đã nhận lệnh ngrok."
         } else {
-            Write-Error "Hoàn toàn thất bại, không lấy được file ngrok.exe nào!"
-            exit 1
+            Write-Error "Winget cài xong nhưng chưa nhận lệnh. Thử tìm file thủ công..."
+            # Dự phòng nếu winget ném vào thư mục ẩn
+            $NgrokPath = Get-ChildItem -Recurse -Path "C:\Program Files", "C:\Users\runneradmin\AppData" -Filter "ngrok.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($NgrokPath) {
+                Copy-Item $NgrokPath.FullName "." -Force
+                Write-Host "Đã lôi được ngrok.exe ra thư mục làm việc!"
+            } else {
+                Write-Error "Không tìm thấy tiến trình ngrok nào!"
+                exit 1
+            }
         }
 
     - name: Kích hoạt RDP (Màn hình từ xa)
@@ -52,21 +49,27 @@ jobs:
         
     - name: Mở cổng và lấy Link kết nối
       run: |
+        # Ép nhận lại Path ở phiên làm việc mới này
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+        
+        # Xác định command ngrok để chạy (gọi trực tiếp hoặc gọi file cục bộ)
+        $NgrokCmd = "ngrok"
+        if (Test-Path ".\ngrok.exe") { $NgrokCmd = ".\ngrok.exe" }
+
         Write-Host "Đang kiểm tra phiên bản và cấu hình Token..."
-        $NgrokVersion = (& .\ngrok.exe version)
-        Write-Host "Phiên bản Ngrok hiện tại: $NgrokVersion"
+        $NgrokVersion = (& $NgrokCmd version)
+        Write-Host "Phiên bản Ngrok đang dùng: $NgrokVersion"
 
         if ($NgrokVersion -match "version 3|3\.") {
             Write-Host "Đang cấu hình kiểu v3..."
-            .\ngrok.exe config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
+            & $NgrokCmd config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
         } else {
             Write-Host "Đang cấu hình kiểu v2..."
-            .\ngrok.exe authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
+            & $NgrokCmd authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
         }
         
         Write-Host "Đang khởi chạy Ngrok công khai..."
-        # Bản v2 hay v3 thì quăng lệnh qua cmd khởi chạy ẩn kiểu này đều nuột
-        cmd /c "start /b .\ngrok.exe tcp 3389 > ngrok.log 2> ngrok_err.log"
+        cmd /c "start /b $NgrokCmd tcp 3389 > ngrok.log 2> ngrok_err.log"
         
         $Attempts = 0
         $MaxAttempts = 15
