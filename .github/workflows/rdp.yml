@@ -9,15 +9,16 @@ jobs:
     timeout-minutes: 360
 
     steps:
-    - name: Tải và giải nén Ngrok (Link CDN chuẩn)
+    - name: Tải và giải nén Ngrok (Bản Stable Mới Nhất)
       run: |
-        # Tải trực tiếp từ server chính của Ngrok, không lo chết link rpc
-        Invoke-WebRequest -Uri "https://bin.equinox.io/a/nmvdrb9Uv9A/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
-        Expand-Archive -Path "ngrok.zip" -DestinationPath "D:\ngrok_files"
+        # Tạo thư mục trước
+        New-Item -ItemType Directory -Force -Path "D:\ngrok_files"
+        # Tải bản windows amd64 stable trực tiếp từ trang download chính thức
+        Invoke-WebRequest -Uri "https://bin.equinox.io/c/b34267at1v/ngrok-v3-stable-windows-amd64.zip" -OutFile "D:\ngrok_files\ngrok.zip"
+        Expand-Archive -Path "D:\ngrok_files\ngrok.zip" -DestinationPath "D:\ngrok_files" -Force
         
     - name: Kết nối tài khoản Ngrok
       run: |
-        # Gọi đích danh file vừa giải nén để add token
         D:\ngrok_files\ngrok.exe config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
         
     - name: Kích hoạt RDP (Màn hình từ xa)
@@ -35,14 +36,11 @@ jobs:
         
     - name: Mở cổng và lấy Link kết nối
       run: |
-        # Tạo file log thủ công bằng quyền PowerShell để tránh lỗi ghi file
         New-Item -Path "D:\ngrok_files\ngrok.log" -ItemType File -Force
-        
-        # Chạy ngrok bằng CMD ngầm để không bị xung đột luồng PowerShell
         cmd /c "start /B D:\ngrok_files\ngrok.exe tcp 3389 --log=stdout > D:\ngrok_files\ngrok.log 2>&1"
         
         $Attempts = 0
-        $MaxAttempts = 8 # Tăng lên 8 lần cho chắc
+        $MaxAttempts = 8
         $Success = $false
         
         while (-not $Success -and $Attempts -lt $MaxAttempts) {
@@ -60,7 +58,6 @@ jobs:
             Write-Host "--- LINK KẾT NỐI RDP CỦA ÔNG ĐÂY ---"
             $Response.Content | Select-String -Pattern 'tcp://[^"]+' -AllMatches | % { $_.Matches } | % { $_.Value }
             Write-Host "------------------------------------"
-            # Treo máy 6 tiếng
             Start-Sleep -Seconds 21600
         } else {
             Write-Error "Ngrok sập rồi! Đây là nội dung log thực tế:"
