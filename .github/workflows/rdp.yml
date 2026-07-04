@@ -34,6 +34,29 @@ jobs:
         
     - name: Mở cổng và lấy Link kết nối
       run: |
-        Start-Process -FilePath "ngrok" -ArgumentList "tcp 3389"
-        Start-Sleep -Seconds 10
-        Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels | Select-String -Pattern 'tcp://[^"]+' -AllMatches | % { $_.Matches } | % { $_.Value }
+        # Gọi thẳng file exe từ thư mục cài đặt của Choco cho chắc cú
+        Start-Process -FilePath "C:\ProgramData\chocolatey\bin\ngrok.exe" -ArgumentList "tcp 3389"
+        
+        # Vòng lặp đợi Ngrok khởi động (thử tối đa 6 lần, mỗi lần cách nhau 5 giây)
+        $Attempts = 0
+        $MaxAttempts = 6
+        $Success = $false
+        
+        while (-not $Success -and $Attempts -lt $MaxAttempts) {
+            try {
+                Start-Sleep -Seconds 5
+                $Response = Invoke-WebRequest -Uri "http://127.0.0.1:4040/api/tunnels" -UseBasicParsing
+                $Success = $true
+            } catch {
+                $Attempts++
+                Write-Host "Đang đợi Ngrok khởi động... (Lần $Attempts/$MaxAttempts)"
+            }
+        }
+        
+        if ($Success) {
+            # Bốc link kết nối công khai ra màn hình log
+            $Response.Content | Select-String -Pattern 'tcp://[^"]+' -AllMatches | % { $_.Matches } | % { $_.Value }
+        } else {
+            Write-Error "Ngrok không chịu khởi động rồi ông ơi!"
+            exit 1
+        }
