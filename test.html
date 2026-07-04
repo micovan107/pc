@@ -1,67 +1,49 @@
 <!DOCTYPE html>
-<html lang="vi">  
+<html lang="vi"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bảng Điều Khiển Máy Ảo GitHub</title>
     <style>
-        /* Reset CSS cơ bản */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            background-color: #0d1117; color: #c9d1d9;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding: 20px;
         }
-
-        h2 {
-            margin-bottom: 5px;
-            color: #58a6ff;
-            font-weight: 600;
-        }
-
-        p {
-            font-size: 14px;
-            color: #8b949e;
-            margin-bottom: 20px;
-        }
-
-        /* Khung chứa Iframe để tạo viền đẹp */
+        h2 { margin-bottom: 5px; color: #58a6ff; font-weight: 600; }
+        p { font-size: 14px; color: #8b949e; margin-bottom: 20px; }
         .wrapper {
-            width: 1280px;
-            height: 800px;
-            border: 2px solid #30363d;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #161b22;
+            width: 1280px; height: 800px;
+            border: 2px solid #30363d; border-radius: 12px;
+            overflow: hidden; background-color: #161b22;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-
-        /* Cấu hình Iframe chiếm trọn khung */
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
 
     <h2>HỆ ĐIỀU HÀNH LINUX MÁY ẢO</h2>
-    <p>Trình duyệt Firefox mặc định - Mượt mà - Không delay</p>
+    <p>Giải pháp GitHub Pages - Chấp mọi thể loại bóp nghẹt của Hosting</p>
 
     <div class="wrapper">
-        <iframe src="https://wbuka-172-214-155-113.run.pinggy-free.link/vnc_lite.html?autoconnect=true&encrypt=1&path=websockify"></iframe>
+        <iframe id="vnc-frame" src=""></iframe>
     </div>
+
+    <script>
+        // JS tự động đọc file config.json do GitHub Actions tự động ghi đè
+        fetch('config.json?t=' + new Date().getTime())
+            .then(res => res.json())
+            .then(data => {
+                if(data && data.url) {
+                    document.getElementById('vnc-frame').src = data.url;
+                    console.log("Đã nạp link máy ảo từ GitHub:", data.url);
+                }
+            })
+            .catch(err => console.error("Chờ máy ảo cập nhật link...", err));
+    </script>
 
 </body>
 </html>
