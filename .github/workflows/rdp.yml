@@ -12,7 +12,7 @@ jobs:
     - name: Cài đặt giao diện đồ họa và bộ công cụ mặc định Linux
       run: |
         sudo apt-get update
-        # Cài đặt môi trường đồ họa, bộ nạp icon idesk và font chữ hiển thị tiếng Trung/Nhật/Hàn/Việt ổn định
+        # Cài đặt môi trường đồ họa, bộ nạp icon idesk, wget tải ảnh và font chữ ổn định
         sudo apt-get install -y xvfb openbox x11vnc novnc websockify xterm pcmanfm mousepad lxmenu-data feh idesk ttf-wqy-zenhei wget
 
     - name: Cấu hình Idesk và tạo Icon Chrome trên Desktop
@@ -45,20 +45,14 @@ jobs:
         end
         EOF
 
-    - name: Tải và cài đặt Ngrok trên Linux
-      run: |
-        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-        echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
-        sudo apt-get update && sudo apt-get install ngrok -y
-
-    - name: Khởi chạy màn hình ảo và bật Ngrok HTTP
+    - name: Khởi chạy màn hình ảo và bật Tunnel qua Pinggy
       run: |
         # 1. Tạo màn hình ảo ẩn dung lượng 1280x800
         Xvfb :1 -screen 0 1280x800x16 &
         export DISPLAY=:1
         sleep 2
         
-        # 2. Tải hình nền theo link yêu cầu và áp dụng hình nền cho màn hình ảo bằng feh
+        # 2. Tải hình nền theo link yêu cầu và áp dụng bằng feh
         wget -O wallpaper.png "https://cdn2.fptshop.com.vn/unsafe/Uploads/images/tin-tuc/183983/Originals/cac-mau-background-4k-cuc-sac-net-1.png" || true
         
         # Bật trình quản lý cửa sổ và icon nền
@@ -75,44 +69,21 @@ jobs:
         x11vnc -display :1 -nopw -listen localhost -bg -forever -xkb -noxfixes -noxdamage -ultrafilexfer -nevershared -dontdisconnect -shared -rfbport 5900 &
         sleep 2
         
-        # 4. Chuyển đổi vnc thành giao diện Web (chạy cổng 6080)
-        websockify --web /usr/share/novnc 6080 localhost:5900 &
+        # 4. Tạo chứng chỉ mã hóa tự chế và chạy websockify hệ mã hóa (chạy cổng 6080)
+        openssl req -x509 -nodes -newkey rsa:2048 -keyout ~/novnc.pem -out ~/novnc.pem -days 365 -subj "/C=VN/ST=NamDinh/L=NamDinh/O=Vex/CN=localhost"
+        websockify --web /usr/share/novnc --cert ~/novnc.pem 6080 localhost:5900 &
         sleep 2
         
-        # 5. Cấu hình Token Ngrok
-        ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        # 5. Khởi chạy Pinggy qua SSH bẻ khóa trang cảnh báo, hỗ trợ chéo domain mượt mà
+        ssh -p 443 -R0:localhost:6080 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 a.pinggy.io "b:skip_browser_warning=true" > pinggy.log 2>&1 &
         
-        # 5.5 Tạo file Traffic Policy chuẩn v3 bẻ khóa chặn Iframe
-        cat << 'EOF' > policy.yml
-        on_http_request:
-          - actions:
-              - type: add-headers
-                config:
-                  headers:
-                    ngrok-skip-browser-warning: "true"
-        on_http_response:
-          - actions:
-              - type: remove-headers
-                config:
-                  headers:
-                    - Content-Security-Policy
-              - type: add-headers
-                config:
-                  headers:
-                    Content-Security-Policy: "frame-ancestors *;"
-                    X-Frame-Options: "ALLOWALL"
-        EOF
-        
-        # 6. Chạy Ngrok HTTP kèm file Traffic Policy
-        ngrok http 6080 --traffic-policy-file=policy.yml --log=stdout > ngrok.log 2>&1 &
-        
-        # 7. Vòng lặp kiểm tra file log trích xuất link
-        echo "Dang cho Ngrok cap nhat link..."
+        # 6. Vòng lặp kiểm tra file log trích xuất link của Pinggy
+        echo "Dang cho Pinggy cap nhat link..."
         LINK=""
         for i in {1..20}; do
           sleep 2
-          if [ -f ngrok.log ]; then
-            LINK=$(cat ngrok.log | grep -o 'https://[^ ]*ngrok-free\.\(app\|dev\)' | head -n 1 || true)
+          if [ -f pinggy.log ]; then
+            LINK=$(cat pinggy.log | grep -o 'https://[^ ]*\.pinggy\.link' | head -n 1 || true)
             if [ ! -z "$LINK" ]; then
               break
             fi
@@ -120,19 +91,19 @@ jobs:
           echo "Thu lai lan $i/20..."
         done
         
-        # 8. In kết quả ra màn hình công khai
+        # 7. In kết quả ra màn hình công khai
         echo "=========================================="
         if [ ! -z "$LINK" ]; then
           echo "BAM VAO LINK NAY DE XEM MAN HINH WEB:"
-          echo "$LINK/vnc.html"
-          echo "Vào web xong chỉ cần bấm nút Connect là thấy Desktop!"
+          echo "$LINK/vnc_lite.html"
+          echo "Vào web xong nó tự kết nối thẳng vào màn hình Desktop hình nền xịn!"
         else
           echo "Khong trich xuat duoc link tu log. Noi dung log hien tai:"
-          cat ngrok.log || true
+          cat pinggy.log || true
         fi
         echo "=========================================="
         
-        # 9. Gọi thẳng Google Chrome gốc có sẵn của máy ảo lên màn hình ảo
+        # 8. Gọi thẳng Google Chrome gốc có sẵn của máy ảo lên màn hình ảo
         google-chrome --no-sandbox --disable-dev-shm-usage &
         
         # Treo máy đúng 4 tiếng
