@@ -9,39 +9,40 @@ jobs:
     timeout-minutes: 360 
 
     steps:
-    - name: Tải và giải nén Ngrok trực tiếp (Link Sạch Tận Gốc)
+    - name: Tải Ngrok bằng liên kết tĩnh bền vững
       run: |
-        Write-Host "Đang tải Ngrok từ đường dẫn trực tiếp..."
-        # Sử dụng link tải trực tiếp không qua channel rpc của bên thứ ba
-        Invoke-WebRequest -Uri "https://bin.equinox.io/a/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip" -ErrorAction SilentlyContinue
+        # Ép PowerShell không tự ý ngắt khi gặp lệnh lỗi 404
+        $ErrorActionPreference = 'SilentlyContinue'
         
-        # Nếu link trên đổi cấu trúc, dùng ngay link CDN dự phòng chính thức này
-        if (-not (Test-Path "ngrok.zip") -or (Get-Item "ngrok.zip").Length -lt 10000) {
-            Write-Host "Chuyển hướng sang link CDN phân phối trực tiếp..."
-            Invoke-WebRequest -Uri "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip" -OutFile "ngrok.zip" -ErrorAction SilentlyContinue
+        Write-Host "Thử cách 1: Tải trực tiếp từ CDN ổn định của Chocolatey..."
+        Invoke-WebRequest -Uri "https://chocolatey.org/api/v2/package/ngrok" -OutFile "ngrok.zip"
+        
+        if (-not (Test-Path "ngrok.zip") -or (Get-Item "ngrok.zip").Length -lt 50000) {
+            Write-Host "Cách 1 thất bại. Thử cách 2: Tải bản phân phối từ GitHub Release..."
+            Invoke-WebRequest -Uri "https://github.com/ngrok/ngrok-go/releases/download/v3.3.0/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
         }
         
-        # Nếu vẫn kẹt (hiếm khi), tải trực tiếp bản setup zip qua winget/direct
-        if (-not (Test-Path "ngrok.zip") -or (Get-Item "ngrok.zip").Length -lt 10000) {
-            Write-Host "Sử dụng giải pháp cuối: Tải trực tiếp từ cổng kết nối gốc..."
-            Invoke-WebRequest -Uri "https://github.com/ngrok/ngrok-go/releases/download/v3.3.0/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip" -ErrorAction SilentlyContinue
+        if (-not (Test-Path "ngrok.zip") -or (Get-Item "ngrok.zip").Length -lt 50000) {
+            Write-Host "Cách 2 thất bại. Thử cách 3: Dùng cdn tĩnh tệp nhỏ..."
+            Invoke-WebRequest -Uri "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip" -OutFile "ngrok.zip"
         }
 
-        Write-Host "Đang giải nén..."
+        # Trả lại cấu hình lỗi bình thường để kiểm tra giải nén
+        $ErrorActionPreference = 'Continue'
+        
+        Write-Host "Đang giải nén bộ cài..."
         Expand-Archive -Path "ngrok.zip" -DestinationPath "." -Force
         
-        if (Test-Path "ngrok.exe") {
-            Write-Host "Đã tải và giải nén thành công ngrok.exe!"
-        } else {
-            # Di chuyển file nếu nó bị nén cuộn trong thư mục con
-            $SubFolderFile = Get-ChildItem -Recurse -Filter "ngrok.exe" | Select-Object -First 1
-            if ($SubFolderFile) {
-                Move-Item $SubFolderFile.FullName "." -Force
-                Write-Host "Đã tìm thấy ngrok.exe trong thư mục con và đưa ra ngoài!"
-            } else {
-                Write-Error "Không tìm thấy file ngrok.exe sau khi giải nén!"
-                exit 1
+        # Tìm ngrok.exe (quét sạch cả thư mục con nếu có)
+        $NgrokFile = Get-ChildItem -Recurse -Filter "ngrok.exe" | Select-Object -First 1
+        if ($NgrokFile) {
+            if ($NgrokFile.DirectoryName -ne (Get-Location).Path) {
+                Move-Item $NgrokFile.FullName "." -Force
             }
+            Write-Host "Đã cấu hình xong file ngrok.exe!"
+        } else {
+            Write-Error "Hoàn toàn thất bại, không lấy được file ngrok.exe nào!"
+            exit 1
         }
 
     - name: Kích hoạt RDP (Màn hình từ xa)
