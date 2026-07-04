@@ -1,53 +1,11 @@
-name: GitHub Actions RDP
-
-on: 
-  workflow_dispatch: 
-
-jobs:
-  build:
-    runs-on: windows-latest
-    timeout-minutes: 360 
-
-    steps:
-    - name: Cài đặt và cấu hình Ngrok tổng lực
+- name: Mở cổng và lấy Link kết nối
       run: |
-        # Cài đặt ngrok
-        choco install ngrok -y
+        Write-Host "Đang cấu hình Token bảo mật..."
+        .\ngrok.exe config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
         
-        # Ép cập nhật Path ngay trong phiên làm việc này
-        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-        
-        # Kiểm tra xem ngrok đã thực sự tồn tại chưa
-        if (get-command ngrok -erroraction SilentlyContinue) {
-            Write-Host "Đã tìm thấy Ngrok trong hệ thống!"
-        } else {
-            Write-Error "Choco cài xong nhưng hệ thống vẫn không nhận lệnh ngrok!"
-            exit 1
-        }
-        
-        # Cấu hình Token
-        ngrok config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
-        
-    - name: Kích hoạt RDP (Màn hình từ xa)
-      run: |
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-        
-    - name: Tạo mật khẩu cho User
-      run: |
-        $Password = ConvertTo-SecureString "MatKhauSieuCapVip123!" -AsPlainText -Force
-        New-LocalUser "GamerChuaNet" -Password $Password -Description "RDP User"
-        Add-LocalGroupMember -Group "Administrators" -Member "GamerChuaNet"
-        Add-LocalGroupMember -Group "Remote Desktop Users" -Member "GamerChuaNet"
-        
-    - name: Mở cổng và lấy Link kết nối
-      run: |
-        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-        
-        Write-Host "Đang khởi chạy Ngrok..."
-        # Khởi chạy ngrok và bắt toàn bộ log (cả lỗi hệ thống) ra file ngrok.log
-        Start-Process -FilePath "ngrok.exe" -ArgumentList "tcp 3389" -RedirectStandardOutput "ngrok.log" -RedirectStandardError "ngrok_err.log"
+        Write-Host "Đang khởi chạy Ngrok công khai..."
+        # Dùng cmd /c để chạy ngầm và đẩy thẳng log ra file ngay lập tức, không qua buffer của PowerShell
+        cmd /c "start /b .\ngrok.exe tcp 3389 > ngrok.log 2> ngrok_err.log"
         
         $Attempts = 0
         $MaxAttempts = 15
@@ -70,10 +28,21 @@ jobs:
             Write-Host "------------------------------------"
             Start-Sleep -Seconds 21600
         } else {
-            Write-Error "Ngrok không phản hồi! Kiểm tra log chi tiết dưới đây:"
-            Write-Host "=== NGROK LOG ==="
-            if (Test-Path "ngrok.log") { Get-Content "ngrok.log" }
-            Write-Host "=== NGROK ERROR LOG ==="
-            if (Test-Path "ngrok_err.log") { Get-Content "ngrok_err.log" }
+            # ÉP IN LOG RA TRƯỚC KHI BÁO LỖI CHẾT SCRIPT
+            Write-Host "========================================="
+            Write-Host "=== KIỂM TRA FILE LOG THỰC TẾ CỦA NGROK ==="
+            Write-Host "========================================="
+            if (Test-Path "ngrok.log") { 
+                Write-Host "--- NGROK.LOG CONTENT ---"
+                Get-Content "ngrok.log" 
+            } else { Write-Host "Không tìm thấy file ngrok.log" }
+            
+            if (Test-Path "ngrok_err.log") { 
+                Write-Host "--- NGROK_ERR.LOG CONTENT ---"
+                Get-Content "ngrok_err.log" 
+            } else { Write-Host "Không tìm thấy file ngrok_err.log" }
+            Write-Host "========================================="
+            
+            Write-Error "Ngrok sập hoàn toàn!"
             exit 1
         }
