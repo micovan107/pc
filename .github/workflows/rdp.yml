@@ -1,0 +1,39 @@
+name: GitHub Actions RDP
+
+on: 
+  workflow_dispatch: # Chỉ chạy khi ông bấm nút thủ công
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360 # GitHub cho tối đa 6 tiếng thôi nhé
+
+    steps:
+    - name: Tải và thiết lập Ngrok
+      run: |
+        Invoke-WebRequest https://bin.equinox.io/c/b34267at1v/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+        Expand-Archive ngrok.zip
+        
+    - name: Kết nối tài khoản Ngrok
+      run: |
+        # Thay NGROK_AUTH_TOKEN bằng token thật của ông trong Settings > Secrets
+        .\ngrok\ngrok.exe config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        
+    - name: Kích hoạt RDP (Màn hình từ xa)
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+        
+    - name: Tạo mật khẩu cho User
+      run: |
+        $Password = ConvertTo-SecureString "MatKhauSieuCapVip123!" -AsPlainText -Force
+        New-LocalUser "RunnerAdmin" -Password $Password -Description "RDP User"
+        Add-LocalGroupMember -Group "Administrators" -Member "RunnerAdmin"
+        Add-LocalGroupMember -Group "Remote Desktop Users" -Member "RunnerAdmin"
+        
+    - name: Mở cổng và lấy Link kết nối
+      run: |
+        Start-Process -FilePath ".\ngrok\ngrok.exe" -ArgumentList "tcp 3389"
+        Start-Sleep -Seconds 10
+        Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels | Select-String -Pattern 'tcp://[^"]+' -AllMatches | % { $_.Matches } | % { $_.Value }
