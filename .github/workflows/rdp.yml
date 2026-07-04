@@ -12,7 +12,6 @@ jobs:
     - name: Cài đặt giao diện đồ họa và bộ công cụ mặc định Linux
       run: |
         sudo apt-get update
-        # Cài đặt môi trường đồ họa, bộ nạp icon idesk, wget tải ảnh và font chữ ổn định
         sudo apt-get install -y xvfb openbox x11vnc novnc websockify xterm pcmanfm mousepad lxmenu-data feh idesk ttf-wqy-zenhei wget
 
     - name: Cấu hình Idesk và tạo Icon Chrome trên Desktop
@@ -34,7 +33,6 @@ jobs:
         end
         EOF
 
-        # Tạo file Icon gọi Google Chrome có sẵn của hệ thống ra Desktop
         cat << 'EOF' > ~/.idesktop/chrome.lnk
         table Icon
           Caption: Google Chrome
@@ -55,7 +53,6 @@ jobs:
         # 2. Tải hình nền theo link yêu cầu và áp dụng bằng feh
         wget -O wallpaper.png "https://cdn2.fptshop.com.vn/unsafe/Uploads/images/tin-tuc/183983/Originals/cac-mau-background-4k-cuc-sac-net-1.png" || true
         
-        # Bật trình quản lý cửa sổ và icon nền
         openbox-session &
         if [ -f wallpaper.png ]; then
           feh --bg-scale wallpaper.png &
@@ -75,15 +72,15 @@ jobs:
         sleep 2
         
         # 5. Khởi chạy Pinggy qua SSH bẻ khóa trang cảnh báo, hỗ trợ chéo domain mượt mà
-        ssh -p 443 -R0:localhost:6080 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 a.pinggy.io "b:skip_browser_warning=true" > pinggy.log 2>&1 &
+        ssh -p 443 -R0:localhost:6080 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 a.pinggy.io "b:skip_browser_warning=true+cors=true" > pinggy.log 2>&1 &
         
-        # 6. Vòng lặp kiểm tra file log trích xuất link của Pinggy
+        # 6. Vòng lặp kiểm tra file log trích xuất link mới của Pinggy
         echo "Dang cho Pinggy cap nhat link..."
         LINK=""
         for i in {1..20}; do
           sleep 2
           if [ -f pinggy.log ]; then
-            LINK=$(cat pinggy.log | grep -o 'https://[^ ]*\.pinggy\.link' | head -n 1 || true)
+            LINK=$(cat pinggy.log | grep -o 'https://[^ ]*\.pinggy-free\.link' | head -n 1 || true)
             if [ ! -z "$LINK" ]; then
               break
             fi
@@ -91,14 +88,18 @@ jobs:
           echo "Thu lai lan $i/20..."
         done
         
-        # 7. In kết quả ra màn hình công khai
+        # 7. TỰ ĐỘNG BẮN LINK VỀ SERVER PHP CỦA ÔNG
         echo "=========================================="
         if [ ! -z "$LINK" ]; then
-          echo "BAM VAO LINK NAY DE XEM MAN HINH WEB:"
-          echo "$LINK/vnc_lite.html"
-          echo "Vào web xong nó tự kết nối thẳng vào màn hình Desktop hình nền xịn!"
+          FULL_URL="$LINK/vnc_lite.html?autoconnect=true&encrypt=1&path=websockify"
+          echo "LINK CỦA ÔNG ĐÂY:"
+          echo "$FULL_URL"
+          
+          # Thực hiện cú đấm curl thần sầu gửi data lên PHP
+          curl -X POST -H "Content-Type: application/json" -d "{\"url\":\"$FULL_URL\"}" "${{ secrets.WEBHOOK_URL }}"
+          echo -e "\n[OK] Da tu dong ban link ve server PHP cua ong!"
         else
-          echo "Khong trich xuat duoc link tu log. Noi dung log hien tai:"
+          echo "Loi khong trich xuat duoc link tu log."
           cat pinggy.log || true
         fi
         echo "=========================================="
