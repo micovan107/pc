@@ -34,8 +34,8 @@ jobs:
         
     - name: Mở cổng và lấy Link kết nối
       run: |
-        # Gọi thẳng file exe từ thư mục cài đặt của Choco cho chắc cú
-        Start-Process -FilePath "C:\ProgramData\chocolatey\bin\ngrok.exe" -ArgumentList "tcp 3389"
+        # Chạy Ngrok và ép nó ghi toàn bộ log ra một file text tên là ngrok.log để bắt bệnh
+        Start-Process -FilePath "C:\ProgramData\chocolatey\bin\ngrok.exe" -ArgumentList "tcp 3389 --log=stdout" -RedirectStandardOutput "ngrok.log"
         
         # Vòng lặp đợi Ngrok khởi động (thử tối đa 6 lần, mỗi lần cách nhau 5 giây)
         $Attempts = 0
@@ -54,9 +54,20 @@ jobs:
         }
         
         if ($Success) {
+            Write-Host "--- LINK KẾT NỐI RDP CỦA ÔNG ĐÂY ---"
             # Bốc link kết nối công khai ra màn hình log
             $Response.Content | Select-String -Pattern 'tcp://[^"]+' -AllMatches | % { $_.Matches } | % { $_.Value }
+            Write-Host "------------------------------------"
+            
+            # Đoạn này cực kỳ quan trọng: Treo máy ảo ngủ 6 tiếng để ông kịp remote vào nghịch
+            Start-Sleep -Seconds 21600
         } else {
-            Write-Error "Ngrok không chịu khởi động rồi ông ơi!"
+            Write-Error "Ngrok sập rồi! Dưới đây là log chi tiết để bắt bệnh:"
+            # Nếu sập, in sạch sành sanh lỗi của thằng ngrok lên màn hình log cho ông xem
+            if (Test-Path "ngrok.log") {
+                Get-Content "ngrok.log"
+            } else {
+                Write-Host "Không tìm thấy file log!"
+            }
             exit 1
         }
