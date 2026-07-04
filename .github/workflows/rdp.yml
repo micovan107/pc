@@ -27,9 +27,10 @@ jobs:
     - name: Tạo mật khẩu cho User
       run: |
         $Password = ConvertTo-SecureString "MatKhauSieuCapVip123!" -AsPlainText -Force
-        New-LocalUser "RunnerAdmin" -Password $Password -Description "RDP User"
-        Add-LocalGroupMember -Group "Administrators" -Member "RunnerAdmin"
-        Add-LocalGroupMember -Group "Remote Desktop Users" -Member "RunnerAdmin"
+        # Đã đổi sang GamerChuaNet để không bị lỗi trùng User có sẵn của GitHub
+        New-LocalUser "GamerChuaNet" -Password $Password -Description "RDP User"
+        Add-LocalGroupMember -Group "Administrators" -Member "GamerChuaNet"
+        Add-LocalGroupMember -Group "Remote Desktop Users" -Member "GamerChuaNet"
         
     - name: Mở cổng và lấy Link kết nối
       run: |
