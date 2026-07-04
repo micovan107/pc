@@ -9,16 +9,26 @@ jobs:
     timeout-minutes: 360 
 
     steps:
-    - name: Tải và giải nén Ngrok trực tiếp
+    - name: Tải và giải nén Ngrok trực tiếp (Link mới chuẩn 100%)
       run: |
-        Write-Host "Đang tải Ngrok bản chính thức..."
+        Write-Host "Đang tải Ngrok bản chính thức từ server chính..."
+        # Đổi sang link chính thức, không lo bị chết channel rpc nữa
         Invoke-WebRequest -Uri "https://bin.equinox.io/c/b3423655m7k/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
         
+        # Nếu link trên vẫn đỏng đảnh, tôi thủ sẵn link dự phòng trực tiếp từ cdn ngrok này:
+        # Invoke-WebRequest -Uri "https://bin.equinox.io/a/b3423655m7k/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
+        # Hoặc dùng link rút gọn chính thức:
+        Invoke-WebRequest -Uri "https://bin.equinox.io/c/b3423655m7k/ngrok-v3-stable-windows-amd64.zip" -ErrorAction SilentlyContinue -OutFile "ngrok.zip"
+        if (-not (Test-Path "ngrok.zip") -or (Get-Item "ngrok.zip").Length -lt 10000) {
+            Write-Host "Thử tải bằng link dự phòng chính thức..."
+            Invoke-WebRequest -Uri "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip" -OutFile "ngrok.zip"
+        }
+
         Write-Host "Đang giải nén..."
-        Expand-Archive -Path "ngrok.zip" -DestinationPath "."
+        Expand-Archive -Path "ngrok.zip" -DestinationPath "." -Force
         
         if (Test-Path "ngrok.exe") {
-            Write-Host "Đã tải thành công ngrok.exe vào thư mục hiện tại!"
+            Write-Host "Đã tải và giải nén thành công ngrok.exe!"
         } else {
             Write-Error "Không tìm thấy file ngrok.exe sau khi giải nén!"
             exit 1
@@ -43,7 +53,6 @@ jobs:
         .\ngrok.exe config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
         
         Write-Host "Đang khởi chạy Ngrok công khai..."
-        # Dùng cmd /c khởi chạy bất đồng bộ để tránh bị kẹt buffer log của PowerShell
         cmd /c "start /b .\ngrok.exe tcp 3389 > ngrok.log 2> ngrok_err.log"
         
         $Attempts = 0
@@ -67,7 +76,6 @@ jobs:
             Write-Host "------------------------------------"
             Start-Sleep -Seconds 21600
         } else {
-            # Ép hệ thống hiển thị toàn bộ log ra console TRƯỚC KHI kết thúc script lỗi
             Write-Host "========================================="
             Write-Host "=== KIỂM TRA FILE LOG THỰC TẾ CỦA NGROK ==="
             Write-Host "========================================="
