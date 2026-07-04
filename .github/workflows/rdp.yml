@@ -94,7 +94,7 @@ jobs:
           echo "Thu lai lan $i/20..."
         done
         
-        # 7. TỰ ĐỘNG GHI ĐÈ VÀO CONFIG.JSON VÀ PUSH LÊN GITHUB REPO
+        # 7. TỰ ĐỘNG GHI ĐÈ VÀO CONFIG.JSON VÀ PUSH LÊN GITHUB REPO (Đã bọc bùa chống sập Pages)
         echo "=========================================="
         if [ ! -z "$LINK" ]; then
           FULL_URL="$LINK/vnc_lite.html?autoconnect=true&encrypt=1&path=websockify"
@@ -104,13 +104,13 @@ jobs:
           # Ghi đè trực tiếp link vào file cấu hình tĩnh json
           echo "{\"url\": \"$FULL_URL\"}" > config.json
           
-          # Thực hiện các lệnh Git thần sầu để đẩy code lên
+          # Thực hiện các lệnh Git kèm cờ chặn kích hoạt luồng build lặp trùng lặp
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add config.json
-          git commit -m "🤖 Tự động cập nhật link máy ảo mới [Skip CI]" || true
+          git commit -m "🤖 Tự động cập nhật link máy ảo mới [skip ci] [pages skip]" || true
           git push origin HEAD:${{ github.ref }} || true
-          echo "[OK] Da tu dong day link may ao len GitHub Pages!"
+          echo "[OK] Da tu dong day link may ao len GitHub Pages an toan!"
         else
           echo "Loi khong trich xuat duoc link tu log."
           cat pinggy.log || true
