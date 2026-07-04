@@ -11,7 +11,6 @@ jobs:
     steps:
     - name: Tải Ngrok bằng liên kết tĩnh bền vững
       run: |
-        # Ép PowerShell không tự ý ngắt khi gặp lệnh lỗi 404
         $ErrorActionPreference = 'SilentlyContinue'
         
         Write-Host "Thử cách 1: Tải trực tiếp từ CDN ổn định của Chocolatey..."
@@ -22,18 +21,11 @@ jobs:
             Invoke-WebRequest -Uri "https://github.com/ngrok/ngrok-go/releases/download/v3.3.0/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
         }
         
-        if (-not (Test-Path "ngrok.zip") -or (Get-Item "ngrok.zip").Length -lt 50000) {
-            Write-Host "Cách 2 thất bại. Thử cách 3: Dùng cdn tĩnh tệp nhỏ..."
-            Invoke-WebRequest -Uri "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip" -OutFile "ngrok.zip"
-        }
-
-        # Trả lại cấu hình lỗi bình thường để kiểm tra giải nén
         $ErrorActionPreference = 'Continue'
         
         Write-Host "Đang giải nén bộ cài..."
         Expand-Archive -Path "ngrok.zip" -DestinationPath "." -Force
         
-        # Tìm ngrok.exe (quét sạch cả thư mục con nếu có)
         $NgrokFile = Get-ChildItem -Recurse -Filter "ngrok.exe" | Select-Object -First 1
         if ($NgrokFile) {
             if ($NgrokFile.DirectoryName -ne (Get-Location).Path) {
@@ -60,10 +52,20 @@ jobs:
         
     - name: Mở cổng và lấy Link kết nối
       run: |
-        Write-Host "Đang cấu hình Token bảo mật..."
-        .\ngrok.exe config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
+        Write-Host "Đang kiểm tra phiên bản và cấu hình Token..."
+        $NgrokVersion = (& .\ngrok.exe version)
+        Write-Host "Phiên bản Ngrok hiện tại: $NgrokVersion"
+
+        if ($NgrokVersion -match "version 3|3\.") {
+            Write-Host "Đang cấu hình kiểu v3..."
+            .\ngrok.exe config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
+        } else {
+            Write-Host "Đang cấu hình kiểu v2..."
+            .\ngrok.exe authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
+        }
         
         Write-Host "Đang khởi chạy Ngrok công khai..."
+        # Bản v2 hay v3 thì quăng lệnh qua cmd khởi chạy ẩn kiểu này đều nuột
         cmd /c "start /b .\ngrok.exe tcp 3389 > ngrok.log 2> ngrok_err.log"
         
         $Attempts = 0
