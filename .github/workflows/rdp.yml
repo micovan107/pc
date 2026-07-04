@@ -43,8 +43,8 @@ jobs:
         # 5. Cấu hình Token Ngrok
         ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
         
-        # 6. Chạy Ngrok HTTP (Bản v3 dùng lệnh này cực chuẩn không sợ check thẻ)
-        ngrok http 6080 --log=stdout > ngrok.log 2>&1 &
+        # 6. Chạy Ngrok HTTP (Bẻ gãy trang cảnh báo và cho phép nhúng Iframe vào web riêng)
+        ngrok http 6080 --log=stdout --request-header-add "ngrok-skip-browser-warning: true" --response-header-remove "Content-Security-Policy" > ngrok.log 2>&1 &
         
         # 7. Vòng lặp kiểm tra file log trích xuất link
         echo "Dang cho Ngrok cap nhat link..."
@@ -72,14 +72,7 @@ jobs:
         fi
         echo "=========================================="
         
-        # 9. Khởi chạy sẵn các ứng dụng mặc định lên màn hình ảo
-        # Mở Trình quản lý tệp (File Manager)
-        pcmanfm &
-        # Mở Terminal gõ lệnh
-        xterm -geometry 80x24+10+10 &
-        # Mở Trình soạn thảo văn bản (Text Editor)
-        mousepad &
-        # Khởi chạy Firefox bản siêu mượt cho môi trường ảo
+        # 9. Chỉ mở sẵn duy nhất Firefox cho sạch màn hình, cần app khác thì CLICK CHUỘT PHẢI
         firefox --no-sandbox &
         
         # Treo máy đúng 4 tiếng
