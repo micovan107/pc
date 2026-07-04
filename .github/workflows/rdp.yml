@@ -1,5 +1,6 @@
 name: Treo Web He Linux Xem Qua Trinh Duyet
-on:
+
+on: 
   workflow_dispatch:
 
 jobs:
@@ -8,11 +9,12 @@ jobs:
     timeout-minutes: 240
 
     steps:
-    - name: Cài đặt giao diện đồ họa và Chrome cho Linux
+    - name: Cài đặt giao diện đồ họa và các ứng dụng mặc định Linux
       run: |
         sudo apt-get update
-        sudo apt-get install -y xvfb fluxbox x11vnc novnc websockify chromium-browser
-        
+        # Cài đặt bộ công cụ hệ thống gọn nhẹ và thêm trình duyệt Firefox mặc định
+        sudo apt-get install -y xvfb fluxbox x11vnc novnc websockify xterm pcmanfm mousepad lxmenu-data firefox
+
     - name: Tải và cài đặt Ngrok trên Linux
       run: |
         curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
@@ -26,11 +28,11 @@ jobs:
         export DISPLAY=:1
         sleep 2
         
-        # 2. Bật trình quản lý cửa sổ
+        # 2. Bật trình quản lý cửa sổ Fluxbox
         fluxbox &
         sleep 2
         
-        # 3. Mở cổng truyền hình ảnh vnc (Đã thêm -forever chống sập khi F5/đóng tab)
+        # 3. Mở cổng truyền hình ảnh vnc chống sập khi đóng/F5 tab
         x11vnc -display :1 -nopw -listen localhost -bg -forever -xkb
         sleep 2
         
@@ -41,10 +43,10 @@ jobs:
         # 5. Cấu hình Token Ngrok
         ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
         
-        # 6. Chạy Ngrok và ép ghi log ra file
+        # 6. Chạy Ngrok HTTP (Bản v3 dùng lệnh này cực chuẩn không sợ check thẻ)
         ngrok http 6080 --log=stdout > ngrok.log 2>&1 &
         
-        # 7. Vòng lặp kiểm tra file log liên tục (Quét cả đuôi .app và .dev mới)
+        # 7. Vòng lặp kiểm tra file log trích xuất link
         echo "Dang cho Ngrok cap nhat link..."
         LINK=""
         for i in {1..20}; do
@@ -70,8 +72,15 @@ jobs:
         fi
         echo "=========================================="
         
-        # Mở sẵn trình duyệt Chromium lên màn hình ảo
-        chromium-browser --no-sandbox --disable-dev-shm-usage &
+        # 9. Khởi chạy sẵn các ứng dụng mặc định lên màn hình ảo
+        # Mở Trình quản lý tệp (File Manager)
+        pcmanfm &
+        # Mở Terminal gõ lệnh
+        xterm -geometry 80x24+10+10 &
+        # Mở Trình soạn thảo văn bản (Text Editor)
+        mousepad &
+        # Khởi chạy Firefox bản siêu mượt cho môi trường ảo
+        firefox --no-sandbox &
         
         # Treo máy đúng 4 tiếng
         sleep 14400
