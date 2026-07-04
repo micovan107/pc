@@ -1,10 +1,49 @@
-- name: Mở cổng và lấy Link kết nối
+name: GitHub Actions RDP
+
+on: 
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360 
+
+    steps:
+    - name: Tải và giải nén Ngrok trực tiếp
+      run: |
+        Write-Host "Đang tải Ngrok bản chính thức..."
+        Invoke-WebRequest -Uri "https://bin.equinox.io/c/b3423655m7k/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
+        
+        Write-Host "Đang giải nén..."
+        Expand-Archive -Path "ngrok.zip" -DestinationPath "."
+        
+        if (Test-Path "ngrok.exe") {
+            Write-Host "Đã tải thành công ngrok.exe vào thư mục hiện tại!"
+        } else {
+            Write-Error "Không tìm thấy file ngrok.exe sau khi giải nén!"
+            exit 1
+        }
+
+    - name: Kích hoạt RDP (Màn hình từ xa)
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+        
+    - name: Tạo mật khẩu cho User
+      run: |
+        $Password = ConvertTo-SecureString "MatKhauSieuCapVip123!" -AsPlainText -Force
+        New-LocalUser "GamerChuaNet" -Password $Password -Description "RDP User"
+        Add-LocalGroupMember -Group "Administrators" -Member "GamerChuaNet"
+        Add-LocalGroupMember -Group "Remote Desktop Users" -Member "GamerChuaNet"
+        
+    - name: Mở cổng và lấy Link kết nối
       run: |
         Write-Host "Đang cấu hình Token bảo mật..."
         .\ngrok.exe config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
         
         Write-Host "Đang khởi chạy Ngrok công khai..."
-        # Dùng cmd /c để chạy ngầm và đẩy thẳng log ra file ngay lập tức, không qua buffer của PowerShell
+        # Dùng cmd /c khởi chạy bất đồng bộ để tránh bị kẹt buffer log của PowerShell
         cmd /c "start /b .\ngrok.exe tcp 3389 > ngrok.log 2> ngrok_err.log"
         
         $Attempts = 0
@@ -28,7 +67,7 @@
             Write-Host "------------------------------------"
             Start-Sleep -Seconds 21600
         } else {
-            # ÉP IN LOG RA TRƯỚC KHI BÁO LỖI CHẾT SCRIPT
+            # Ép hệ thống hiển thị toàn bộ log ra console TRƯỚC KHI kết thúc script lỗi
             Write-Host "========================================="
             Write-Host "=== KIỂM TRA FILE LOG THỰC TẾ CỦA NGROK ==="
             Write-Host "========================================="
