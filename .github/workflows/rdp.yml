@@ -9,29 +9,21 @@ jobs:
     timeout-minutes: 360 
 
     steps:
-    - name: Cài đặt Ngrok chính thức bằng Winget
+    - name: Cài đặt và Nâng cấp Ngrok lên bản mới nhất
       run: |
-        Write-Host "Đang dùng Winget để cài đặt Ngrok bản mới nhất..."
-        # Winget cài cực sạch, tự động nhận cấu hình môi trường
+        Write-Host "Đang dùng Winget để cài đặt Ngrok..."
         winget install ngrok.ngrok --accept-source-agreements --accept-package-agreements
         
-        # Làm mới lại biến Path ngay tại step này để nhận lệnh ngrok
+        # Làm mới lại biến Path ngay tại step này
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
         
-        # Kiểm tra xem hệ thống đã nhận lệnh ngrok chưa
+        # Kiểm tra và ép nâng cấp Ngrok lên bản mới nhất để tránh lỗi v3.3.1 quá cũ
         if (Get-Command ngrok -ErrorAction SilentlyContinue) {
-            Write-Host "Ngon lành! Hệ thống đã nhận lệnh ngrok."
+            Write-Host "Đang tiến hành cập nhật Ngrok lên phiên bản mới nhất từ trang chủ..."
+            ngrok update
         } else {
-            Write-Error "Winget cài xong nhưng chưa nhận lệnh. Thử tìm file thủ công..."
-            # Dự phòng nếu winget ném vào thư mục ẩn
-            $NgrokPath = Get-ChildItem -Recurse -Path "C:\Program Files", "C:\Users\runneradmin\AppData" -Filter "ngrok.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-            if ($NgrokPath) {
-                Copy-Item $NgrokPath.FullName "." -Force
-                Write-Host "Đã lôi được ngrok.exe ra thư mục làm việc!"
-            } else {
-                Write-Error "Không tìm thấy tiến trình ngrok nào!"
-                exit 1
-            }
+            Write-Error "Không tìm thấy lệnh ngrok để cập nhật!"
+            exit 1
         }
 
     - name: Kích hoạt RDP (Màn hình từ xa)
@@ -49,27 +41,17 @@ jobs:
         
     - name: Mở cổng và lấy Link kết nối
       run: |
-        # Ép nhận lại Path ở phiên làm việc mới này
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
         
-        # Xác định command ngrok để chạy (gọi trực tiếp hoặc gọi file cục bộ)
-        $NgrokCmd = "ngrok"
-        if (Test-Path ".\ngrok.exe") { $NgrokCmd = ".\ngrok.exe" }
+        Write-Host "Đang kiểm tra phiên bản thực tế sau khi update..."
+        $NgrokVersion = (& ngrok version)
+        Write-Host "Phiên bản Ngrok sau nâng cấp: $NgrokVersion"
 
-        Write-Host "Đang kiểm tra phiên bản và cấu hình Token..."
-        $NgrokVersion = (& $NgrokCmd version)
-        Write-Host "Phiên bản Ngrok đang dùng: $NgrokVersion"
-
-        if ($NgrokVersion -match "version 3|3\.") {
-            Write-Host "Đang cấu hình kiểu v3..."
-            & $NgrokCmd config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
-        } else {
-            Write-Host "Đang cấu hình kiểu v2..."
-            & $NgrokCmd authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
-        }
+        Write-Host "Đang cấu hình Token bảo mật..."
+        ngrok config add-authtoken "${{ secrets.NGROK_AUTH_TOKEN }}"
         
         Write-Host "Đang khởi chạy Ngrok công khai..."
-        cmd /c "start /b $NgrokCmd tcp 3389 > ngrok.log 2> ngrok_err.log"
+        cmd /c "start /b ngrok tcp 3389 > ngrok.log 2> ngrok_err.log"
         
         $Attempts = 0
         $MaxAttempts = 15
