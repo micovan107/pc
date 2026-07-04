@@ -9,15 +9,14 @@ jobs:
     timeout-minutes: 360 # GitHub cho tối đa 6 tiếng thôi nhé
 
     steps:
-    - name: Tải và thiết lập Ngrok
+    - name: Tải và thiết lập Ngrok bằng Choco
       run: |
-        Invoke-WebRequest https://bin.equinox.io/c/b34267at1v/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-        Expand-Archive ngrok.zip
+        choco install ngrok
         
     - name: Kết nối tài khoản Ngrok
       run: |
-        # Thay NGROK_AUTH_TOKEN bằng token thật của ông trong Settings > Secrets
-        .\ngrok\ngrok.exe config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        # Hệ thống tự bốc token từ GitHub Secrets ông đã cài
+        ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
         
     - name: Kích hoạt RDP (Màn hình từ xa)
       run: |
@@ -34,6 +33,6 @@ jobs:
         
     - name: Mở cổng và lấy Link kết nối
       run: |
-        Start-Process -FilePath ".\ngrok\ngrok.exe" -ArgumentList "tcp 3389"
+        Start-Process -FilePath "ngrok" -ArgumentList "tcp 3389"
         Start-Sleep -Seconds 10
         Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels | Select-String -Pattern 'tcp://[^"]+' -AllMatches | % { $_.Matches } | % { $_.Value }
