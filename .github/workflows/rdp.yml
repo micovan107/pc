@@ -9,6 +9,12 @@ jobs:
     timeout-minutes: 240
 
     steps:
+    # BẮT BUỘC PHẢI CHECKOUT CODE VỀ ĐỂ LÁT NỮA PUSH LÊN
+    - name: Checkout mã nguồn repo
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Cài đặt giao diện đồ họa và bộ công cụ mặc định Linux
       run: |
         sudo apt-get update
@@ -88,21 +94,23 @@ jobs:
           echo "Thu lai lan $i/20..."
         done
         
-        # 7. TỰ ĐỘNG BẮN LINK VỀ SERVER PHP CỦA ÔNG (Đã bọc chống crash Malformed)
+        # 7. TỰ ĐỘNG GHI ĐÈ VÀO CONFIG.JSON VÀ PUSH LÊN GITHUB REPO
         echo "=========================================="
         if [ ! -z "$LINK" ]; then
           FULL_URL="$LINK/vnc_lite.html?autoconnect=true&encrypt=1&path=websockify"
-          echo "LINK CỦA ÔNG ĐÂY:"
+          echo "LINK MỚI CỦA ÔNG:"
           echo "$FULL_URL"
           
-          # Check xem ông đã set secret chưa, có thì mới bắn curl
-          if [ ! -z "${{ secrets.WEBHOOK_URL }}" ]; then
-            echo "Đang bắn Webhook về server PHP của ông..."
-            curl -X POST -H "Content-Type: application/json" -d "{\"url\":\"$FULL_URL\"}" "${{ secrets.WEBHOOK_URL }}"
-            echo -e "\n[OK] Da tu dong ban link ve server PHP cua ong!"
-          else
-            echo "[CẢNH BÁO] Ông chưa thêm biến WEBHOOK_URL vào GitHub Secrets đâu đấy nhé!"
-          fi
+          # Ghi đè trực tiếp link vào file cấu hình tĩnh json
+          echo "{\"url\": \"$FULL_URL\"}" > config.json
+          
+          # Thực hiện các lệnh Git thần sầu để đẩy code lên
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add config.json
+          git commit -m "🤖 Tự động cập nhật link máy ảo mới [Skip CI]" || true
+          git push origin HEAD:${{ github.ref }} || true
+          echo "[OK] Da tu dong day link may ao len GitHub Pages!"
         else
           echo "Loi khong trich xuat duoc link tu log."
           cat pinggy.log || true
